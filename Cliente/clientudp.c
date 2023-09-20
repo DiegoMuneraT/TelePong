@@ -12,6 +12,9 @@
 
 // Conexion tomada de Geeks and Geeks
 
+
+
+
 int main()
 {
 	int sockfd;
@@ -39,13 +42,26 @@ int main()
     int n;
     socklen_t len;
 
-    sendto(sockfd, (const char *)hello, strlen(hello), 200, (SA*)&servaddr, sizeof(servaddr));
-    printf("Hello message sent.\n");
+    for (;;){
+        bzero(buffer, sizeof(buffer));
+		printf("Enter the string : ");
+		n = 0;
+		while ((buffer[n++] = getchar()) != '\n')
+			;
+        sendto(sockfd, buffer, sizeof(buffer), 200, (SA*)&servaddr, sizeof(servaddr));
+		bzero(buffer, sizeof(buffer));
+		read(sockfd, buffer, sizeof(buffer));
+        n = recvfrom(sockfd, (char *)buffer, MAX, MSG_WAITALL, (SA*)&servaddr, &len);
+		printf("From Server : %s", buffer);
+        printf("Message sent.\n");
+        buffer[n] = '\0';
+        printf("Server : %s\n", buffer);
+        if ((strncmp(buffer, "exit", 4)) == 0) {
+			printf("Client Exit...\n");
+			break;
+		}
+    }
 
-    n = recvfrom(sockfd, (char *)buffer, MAX, MSG_WAITALL, (SA*)&servaddr, &len);
-
-    buffer[n] = '\0';
-    printf("Server : %s\n", buffer);
     close(sockfd);
     return 0;
 }
