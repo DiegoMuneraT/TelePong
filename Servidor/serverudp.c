@@ -12,41 +12,6 @@
 
 // Conexion tomada de Geeks and Geeks
 
-// Function designed for chat between client and server.
-void func(int connfd)
-{
-	char buff[MAX];
-	int n;
-	// infinite loop for chat
-	for (;;) {
-		bzero(buff, MAX);
-
-		// read the message from client and copy it in buffer
-		read(connfd, buff, sizeof(buff));
-		// print buffer which contains the client contents
-		printf("From client: %s\t To client : ", buff);
-		bzero(buff, MAX);
-		n = 0;
-		// copy server message in the buffer
-		while ((buff[n++] = getchar()) != '\n')
-			;
-
-		// and send that buffer to client
-		write(connfd, buff, sizeof(buff));
-
-		// if msg contains "Exit" then server exit and chat ended.
-		if (strncmp("exit", buff, 4) == 0) {
-			printf("Server Exit...\n");
-			break;
-		}
-		// if msg contains "move" then server make move.
-		if ((strncmp(buff, "move", 4)) == 0) {
-			printf("server make move...\n");
-			continue;
-		}
-	}
-}
-
 // Driver function
 int main()
 {
@@ -81,15 +46,29 @@ int main()
 		printf("Socket successfully binded..\n");
 
     int n;
+	
+	len = sizeof(cliaddr); //len is value/result
 
-    len = sizeof(cliaddr); //len is value/result
+	for (;;) {
+		// read the message from client and copy it in buffer
+		n = recvfrom(sockfd, (char *)buffer, MAX, MSG_WAITALL, (SA*)&cliaddr, &len);
+		// print buffer which contains the client contents
+		buffer[n] = '\0';
+    	printf("Client : %s\n", buffer);
+		// copy server message in the buffer
+		while ((buffer[n++] = getchar()) != '\n')
+			;
 
-    n = recvfrom(sockfd, (char *)buffer, MAX, MSG_WAITALL, (SA*)&cliaddr, &len);
-
-    buffer[n] = '\0';
-    printf("Client : %s\n", buffer);
-    sendto(sockfd, (const char *)hello, strlen(hello), 200, (SA*)&cliaddr, len);
-    printf("Hello message sent.\n");
+		// and send that buffer to client
+		sendto(sockfd, buffer, sizeof(buffer), 200, (SA*)&cliaddr, len);
+		printf("message sent.\n");
+		// if msg contains "Exit" then server exit and chat ended.
+		if (strncmp("exit", buffer, 4) == 0) {
+			printf("Server Exit...\n");
+			break;
+		}
+		// if msg contains "move" then server make move.
+	}
 	
     return 0;
     
