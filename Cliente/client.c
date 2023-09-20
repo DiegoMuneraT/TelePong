@@ -10,6 +10,8 @@
 #define PORT 8080
 #define SA struct sockaddr
 
+// Conexion tomada de Geeks and Geeks
+
 void func(int sockfd)
 {
 	char buff[MAX];
@@ -24,13 +26,16 @@ void func(int sockfd)
 		bzero(buff, sizeof(buff));
 		read(sockfd, buff, sizeof(buff));
 		printf("From Server : %s", buff);
+
+		// if server msg contains "Exit" then client exit
 		if ((strncmp(buff, "exit", 4)) == 0) {
 			printf("Client Exit...\n");
 			break;
 		}
-        if ((strncmp(buff, "MOVED X, Y", 4)) == 0) {
-			printf("Client Ball Moved...\n");
-			
+
+		if ((strncmp(buff, "move ok", 4)) == 0) {
+			printf("Client moving...\n");
+			continue;
 		}
 	}
 }

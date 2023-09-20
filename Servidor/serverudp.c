@@ -50,65 +50,47 @@ void func(int connfd)
 // Driver function
 int main()
 {
-	int sockfd, connfd;
+    char buffer[MAX];
+	int sockfd;
 	socklen_t len;
 	pid_t childpid;
-	struct sockaddr_in servaddr, cli;
+	struct sockaddr_in servaddr, cliaddr;
+    const char *hello = "Hello from server";
 
-	// socket create and verification
-	sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	if (sockfd == -1) {
-		printf("socket creation failed...\n");
-		exit(0);
-	}
-	else
-		printf("Socket successfully created..\n");
-	bzero(&servaddr, sizeof(servaddr));
+    // Creating socket file descriptor
+    if((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
+        perror("socket creation failed");
+        exit(EXIT_FAILURE);
+    }
 
-	// assign IP, PORT
-	servaddr.sin_family = AF_INET;
-	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    memset(&servaddr, 0, sizeof(servaddr));
+    memset(&cliaddr, 0, sizeof(cliaddr));
+
+    // Fillig server information
+	servaddr.sin_family = AF_INET; // IPv4
+	servaddr.sin_addr.s_addr = INADDR_ANY;
 	servaddr.sin_port = htons(PORT);
 
 	// Binding newly created socket to given IP and verification
-	if ((bind(sockfd, (SA*)&servaddr, sizeof(servaddr))) != 0) {
+	if ((bind(sockfd, (SA*)&servaddr, sizeof(servaddr))) < 0) 
+    {
 		printf("socket bind failed...\n");
-		exit(0);
+		exit(EXIT_FAILURE);
 	}
 	else
 		printf("Socket successfully binded..\n");
 
-	// Now server is ready to listen and verification
-	if ((listen(sockfd, 5)) != 0) {
-		printf("Listen failed...\n");
-		exit(0);
-	}
-	else
-		printf("Server listening..\n");
-	len = sizeof(cli);
+    int n;
 
-	while (1)
-	{
-		// Accept the data packet from client and verification
-		connfd = accept(sockfd, (SA *)&cli, &len);
-		if (connfd < 0)
-		{
-			printf("server accept failed...\n");
-			exit(0);
-		}
-		else
-			printf("server accept the client...\n");
+    len = sizeof(cliaddr); //len is value/result
 
-		// Forking a child process
-		if ((childpid = fork()) == 0)
-		{
-			close(sockfd); // Child process closes listening socket
-			func(connfd);  // Child process handles client request
-			exit(0);	   // Child process exits
-		}
-		close(connfd); // Parent process closes connected socket
-	}
-	// After chatting close the socket
-	close(sockfd);
-	return 0;
+    n = recvfrom(sockfd, (char *)buffer, MAX, MSG_WAITALL, (SA*)&cliaddr, &len);
+
+    buffer[n] = '\0';
+    printf("Client : %s\n", buffer);
+    sendto(sockfd, (const char *)hello, strlen(hello), 200, (SA*)&cliaddr, len);
+    printf("Hello message sent.\n");
+	
+    return 0;
+    
 }
