@@ -1,75 +1,61 @@
 #include <stdio.h>
-#include <netdb.h>
-#include <netinet/in.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h> // read(), write(), close()
-#define MAX 80
-#define PORT 8080
-#define SA struct sockaddr
+#include <unistd.h>
+#include <arpa/inet.h>
 
-// Conexion tomada de Geeks and Geeks
+#define MAX_MSG_LEN 1024
+// #define SERVER_IP "127.0.0.1"
+#define SERVER_PORT 8080
 
-// Driver function
-int main()
-{
-    char buffer[MAX];
-	int sockfd;
-	socklen_t len;
-	pid_t childpid;
-	struct sockaddr_in servaddr, cliaddr;
-    const char *hello = "Hello from server";
+int main() {
+    int sockfd;
+    char buffer[MAX_MSG_LEN];
+    struct sockaddr_in serverAddr, clientAddr;
 
-    // Creating socket file descriptor
-    if((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
-        perror("socket creation failed");
-        exit(EXIT_FAILURE);
+    // Create UDP socket
+    sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (sockfd < 0) {
+        perror("Error in socket creation");
+        exit(1);
     }
 
-    memset(&servaddr, 0, sizeof(servaddr));
-    memset(&cliaddr, 0, sizeof(cliaddr));
+    memset(&serverAddr, 0, sizeof(serverAddr));
+    memset(&clientAddr, 0, sizeof(clientAddr));
 
-    // Fillig server information
-	servaddr.sin_family = AF_INET; // IPv4
-	servaddr.sin_addr.s_addr = INADDR_ANY;
-	servaddr.sin_port = htons(PORT);
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_port = htons(SERVER_PORT);
+    // Cualquier dirección IP
+    serverAddr.sin_addr.s_addr = INADDR_ANY;
 
-	// Binding newly created socket to given IP and verification
-	if ((bind(sockfd, (SA*)&servaddr, sizeof(servaddr))) < 0) 
-    {
-		printf("socket bind failed...\n");
-		exit(EXIT_FAILURE);
-	}
-	else
-		printf("Socket successfully binded..\n");
+    if (bind(sockfd, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
+        perror("Error en el enlace");
+        exit(1);
+    }
 
-    int n;
-	
-	len = sizeof(cliaddr); //len is value/result
+    printf("Servidor escuchando en el puerto %d...\n", SERVER_PORT);
 
-	for (;;) {
-		// read the message from client and copy it in buffer
-		n = recvfrom(sockfd, (char *)buffer, MAX, MSG_WAITALL, (SA*)&cliaddr, &len);
-		// print buffer which contains the client contents
-		buffer[n] = '\0';
-    	printf("Client : %s\n", buffer);
-		// copy server message in the buffer
-		while ((buffer[n++] = getchar()) != '\n')
-			;
+    socklen_t clientLen = sizeof(clientAddr);
 
-		// and send that buffer to client
-		sendto(sockfd, buffer, sizeof(buffer), 200, (SA*)&cliaddr, len);
-		printf("message sent.\n");
-		// if msg contains "Exit" then server exit and chat ended.
-		if (strncmp("exit", buffer, 4) == 0) {
-			printf("Server Exit...\n");
-			break;
-		}
-		// if msg contains "move" then server make move.
-	}
-	
+    while (1) {
+        // Recibir mensaje del cliente
+        ssize_t recvBytes = recvfrom(sockfd, buffer, MAX_MSG_LEN, 0, (struct sockaddr*)&clientAddr, &clientLen);
+        buffer[recvBytes] = '\0';
+
+        // Imprimir el mensaje recibido
+        printf("Cliente[%s:%d]: %s\n", inet_ntoa(clientAddr.sin_addr), ntohs(clientAddr.sin_port), buffer);
+
+        if (strcmp(buffer, "exit\n") == 0) {
+            printf("Cliente[%s:%d] se ha desconectado\n", inet_ntoa(clientAddr.sin_addr), ntohs(clientAddr.sin_port));
+            break;
+        }
+
+        // Enviar una respuesta al cliente
+        printf("Servidor: ");
+        fgets(buffer, MAX_MSG_LEN, stdin);
+        sendto(sockfd, buffer, strlen(buffer), 0, (struct sockaddr*)&clientAddr, clientLen);
+    }
+
+    close(sockfd);
     return 0;
-    
 }

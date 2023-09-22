@@ -12,8 +12,33 @@
 
 // Conexion tomada de Geeks and Geeks
 
+void func(int sockfd)
+{
+	char buff[MAX];
+	int n;
+	for (;;) {
+		bzero(buff, sizeof(buff));
+		printf("Enter the string : ");
+		n = 0;
+		while ((buff[n++] = getchar()) != '\n')
+			;
+		write(sockfd, buff, sizeof(buff));
+		bzero(buff, sizeof(buff));
+		read(sockfd, buff, sizeof(buff));
+		printf("From Server : %s", buff);
 
+		// if server msg contains "Exit" then client exit
+		if ((strncmp(buff, "exit", 4)) == 0) {
+			printf("Client Exit...\n");
+			break;
+		}
 
+		if ((strncmp(buff, "move ok", 4)) == 0) {
+			printf("Client moving...\n");
+			continue;
+		}
+	}
+}
 
 int main()
 {
@@ -42,26 +67,13 @@ int main()
     int n;
     socklen_t len;
 
-    for (;;){
-        bzero(buffer, sizeof(buffer));
-		printf("Enter the string : ");
-		n = 0;
-		while ((buffer[n++] = getchar()) != '\n')
-			;
-        sendto(sockfd, buffer, sizeof(buffer), 200, (SA*)&servaddr, sizeof(servaddr));
-		bzero(buffer, sizeof(buffer));
-		read(sockfd, buffer, sizeof(buffer));
-        n = recvfrom(sockfd, (char *)buffer, MAX, MSG_WAITALL, (SA*)&servaddr, &len);
-		printf("From Server : %s", buffer);
-        printf("Message sent.\n");
-        buffer[n] = '\0';
-        printf("Server : %s\n", buffer);
-        if ((strncmp(buffer, "exit", 4)) == 0) {
-			printf("Client Exit...\n");
-			break;
-		}
-    }
+    sendto(sockfd, (const char *)hello, strlen(hello), 200, (SA*)&servaddr, sizeof(servaddr));
+    printf("Hello message sent.\n");
 
+    n = recvfrom(sockfd, (char *)buffer, MAX, MSG_WAITALL, (SA*)&servaddr, &len);
+
+    buffer[n] = '\0';
+    printf("Server : %s\n", buffer);
     close(sockfd);
     return 0;
 }
