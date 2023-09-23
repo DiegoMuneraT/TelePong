@@ -29,7 +29,7 @@ int main() {
     socklen_t addr_len = sizeof(struct sockaddr_in);
     char buffer[BUFFER_SIZE];
     char inputText[BUFFER_SIZE];
-    char game[] = "0,0,0,0,0,0,0";
+    char game[200] = "0,";
 
     // Create UDP socket
     if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
@@ -67,10 +67,22 @@ int main() {
                 printf("Marking message from client 1\n");
                 client1.hasReceivedMessage = 1;
                 client1.addr = client_addr;
-                // sendTextToClient(sockfd, &(client1.addr), addr_len, "Esperando otro jugador...");
+                strcat(game,inet_ntoa(client_addr.sin_addr));
+                char port[20] = "";
+                sprintf(port, "%d", ntohs(client_addr.sin_port));
+                strcat(game,":");
+                strcat(game,port);
+                strcat(game,",");
+                sendTextToClient(sockfd, &(client1.addr), addr_len, game);
             } else if (!client2.hasReceivedMessage && !compareClientAddr(&(client1.addr), &client_addr)) {
                 printf("Marking message from client 2\n");
                 game[0] = '1';
+                strcat(game,inet_ntoa(client_addr.sin_addr));
+                char port[20] = "";
+                sprintf(port, "%d", ntohs(client_addr.sin_port));
+                strcat(game,":");
+                strcat(game,port);
+                strcat(game,",0,0,0,0,0,0");
                 client2.hasReceivedMessage = 1;
                 client2.addr = client_addr;
                 sendTextToClient(sockfd, &(client1.addr), addr_len, game);

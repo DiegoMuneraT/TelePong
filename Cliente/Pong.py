@@ -5,24 +5,14 @@ import socket
 
 # Se guarda el estado de las variables
 # 0: Estado del Juego, 1: Posición de la raqueta A, 2: Posición de la raqueta B, 3: Posición de la bola en X, 4: Posicion de la bola en Y, 5: Puntaje A, 6: Puntaje B
-estado = [0, 0, 0, 0, 0, 0, 0]
-
-def receive_state(client_socket):
-    while True:
-        try:
-            data, server_address = client_socket.recvfrom(constants.MAX_MSG_LEN)
-            print(f"Server: {data.decode()}")
-        except socket.error as e:
-            pass  # Ignore socket errors
+estado = [ 0, 0, 0, 0, 0, 0, 0]
+mypaddle = 0
 
 # Create a UDP/IP socket
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 # Set the socket to non-blocking
 client_socket.setblocking(0)
-
-# Start a thread to receive messages from the server
-receive_thread = threading.Thread(target=receive_state, args=(client_socket,))
 
 wn = turtle.Screen()
 wn.title("Pong")
@@ -74,41 +64,78 @@ pen.write("Cliente A: 0  Cliente B: 0", align="center", font=("Courier", 24, "no
 
 # Movimiento de las raquetas
 def paddle_a_up():
-    y = paddle_a.ycor()
+    if mypaddle == 1:
+        y = paddle_a.ycor()
+    else:
+        y = paddle_b.ycor()
     y += 20
-    client_socket.sendto(str(y).encode(), (constants.SERVER_IP, constants.SERVER_PORT))
+    message = "pmu:"+str(y)
+    client_socket.sendto(message.encode(), (constants.SERVER_IP, constants.SERVER_PORT))
     paddle_a.sety(y)
 
 def paddle_a_down():
-    y = paddle_a.ycor()
+    if mypaddle == 1:
+        y = paddle_a.ycor()
+    else:
+        y = paddle_b.ycor()
     y -= 20
-    client_socket.sendto(str(y).encode(), (constants.SERVER_IP, constants.SERVER_PORT))
+    message = "pmd:"+str(y)
+    client_socket.sendto(message.encode(), (constants.SERVER_IP, constants.SERVER_PORT))
     paddle_a.sety(y)
 
-def paddle_b_up():
-    y = paddle_b.ycor()
-    y += 20
-    client_socket.sendto(str(y).encode(), (constants.SERVER_IP, constants.SERVER_PORT))
-    paddle_b.sety(y)
+# def paddle_b_up():
+#     y = paddle_b.ycor()
+#     y += 20
+#     client_socket.sendto(str(y).encode(), (constants.SERVER_IP, constants.SERVER_PORT))
+#     paddle_b.sety(y)
 
-def paddle_b_down():
-    y = paddle_b.ycor()
-    y -= 20
-    client_socket.sendto(str(y).encode(), (constants.SERVER_IP, constants.SERVER_PORT))
-    paddle_b.sety(y)
+# def paddle_b_down():
+#     y = paddle_b.ycor()
+#     y -= 20
+#     client_socket.sendto(str(y).encode(), (constants.SERVER_IP, constants.SERVER_PORT))
+#     paddle_b.sety(y)
+
+def receive_state(client_socket):
+    while True:
+        try:
+            data, server_address = client_socket.recvfrom(constants.MAX_MSG_LEN)
+            print(f"Server: {data.decode()}")
+            estado = data.decode().split(",");
+            # reemplazar constants.SERVER_IP por ip del socket.
+            player = str(constants.SERVER_IP) + ":" + str(client_socket.getsockname()[1])
+            print(estado)
+            print(player)
+            if estado[1] == player:
+                print("entra 1")
+                # Asignarle 1 a paddle
+            elif estado[2] == player:
+                print("entra 2")
+                # Asignarle 2 a paddle
+        except socket.error as e:
+            pass  # Ignore socket errors
 
 # Entrada de teclado
 wn.listen()
 # Con cada entrada de teclado se envía un mensaje al servidor actualizando la posición de la raqueta
 wn.onkeypress(paddle_a_up, "w")
 wn.onkeypress(paddle_a_down, "s")
-wn.onkeypress(paddle_b_up, "w")
-wn.onkeypress(paddle_b_down, "s")
+# wn.onkeypress(paddle_b_up, "w")
+# wn.onkeypress(paddle_b_down, "s")
+
+# Start a thread to receive messages from the server
+receive_thread = threading.Thread(target=receive_state, args=(client_socket,))
 
 # Inicio del thread
 receive_thread.start()
+
+message = "Ingreso"
+client_socket.sendto(message.encode(), (constants.SERVER_IP, constants.SERVER_PORT))
+
 # Loop principal del juego
 while True:
+
+    if estado[0] == 0:
+        continue
 
     wn.update()
     
