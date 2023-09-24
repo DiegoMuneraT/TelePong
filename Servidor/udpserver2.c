@@ -72,53 +72,45 @@ int main() {
 
             // Miramos si el servidor recibió un mensaje
             if (!client1.hasReceivedMessage) {
+
                 printf("Marking message from client 1\n");
                 client1.hasReceivedMessage = 1;
                 client1.addr = client_addr;
-                strcat(game,inet_ntoa(client_addr.sin_addr));
+                // strcat(game,inet_ntoa(client_addr.sin_addr));
                 char port[20] = "";
                 sprintf(port, "%d", ntohs(client_addr.sin_port));
-                strcat(game,":");
+                // strcat(game,":");
                 strcat(game,port);
                 strcat(game,",");
                 sendTextToClient(sockfd, &(client1.addr), addr_len, game);
             
             // Si el cliente 1 ya envió un mensaje, miramos si el cliente 2 ya envió un mensaje
             } else if (!client2.hasReceivedMessage && !compareClientAddr(&(client1.addr), &client_addr)) {
+
                 printf("Marking message from client 2\n");
                 game[0] = '1';
-                strcat(game,inet_ntoa(client_addr.sin_addr));
+                // strcat(game,inet_ntoa(client_addr.sin_addr));
                 char port[20] = "";
                 sprintf(port, "%d", ntohs(client_addr.sin_port));
-                strcat(game,":");
+                // strcat(game,":");
                 strcat(game,port);
                 strcat(game,",0,0,0,0,0,0");
                 client2.hasReceivedMessage = 1;
                 client2.addr = client_addr;
-                // break?
-                sendTextToClient(sockfd, &(client1.addr), addr_len, game);
-                sendTextToClient(sockfd, &(client2.addr), addr_len, game);
             }
         }
 
         // Miramos si ambos clientes ya enviaron un mensaje
         if (client1.hasReceivedMessage && client2.hasReceivedMessage) {
-            // Prompt the server for input text
-            printf("Enter text to send to clients: ");
-            fgets(inputText, BUFFER_SIZE, stdin);
-            strtok(inputText, "\n");  // Remove the newline character
 
             // Mandamos la información a los clientes
-            sendTextToClient(sockfd, &(client1.addr), addr_len, inputText);
-            sendTextToClient(sockfd, &(client2.addr), addr_len, inputText);
+            sendTextToClient(sockfd, &(client1.addr), addr_len, game);
+            sendTextToClient(sockfd, &(client2.addr), addr_len, game);
 
             // Reset the message status
             //client1.hasReceivedMessage = 0;
             //client2.hasReceivedMessage = 0;
         }
-
-        // Simulate some processing time before the next iteration
-        usleep(10000);  // 10 milliseconds
     }
 
     close(sockfd);
