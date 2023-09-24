@@ -115,14 +115,14 @@ def receive_state(client_socket):
             print(f"Server: {data.decode()}")
             estado = data.decode().split(",")
 
-            player = f"{client_socket.getsockname()[1]}"
+            # player = f"{client_socket.getsockname()[1]}"
 
-            print(estado)
-            print(player)
+            # print(estado)
+            # print(player)
 
             # Asignarle las direcciones a los jugadores
-            if estado[1] is not None and estado[2] != "":
-                print("Ambos jugadores conectados")
+            # if estado[1] is not None and estado[2] != "":
+                # print("Ambos jugadores conectados")
 
         except socket.error as e:
             pass
@@ -164,13 +164,13 @@ wn.onkeypress(paddle_down, "s")
 # Loop principal del juego
 while score_a < 5:
 
-    wn.update()    
+    wn.update() 
 
-    if estado[1] == f"{client_socket.getsockname()[1]}" and paddle_b.ycor() != estado[4]:
-        paddle_b.sety(estado[4])
+    if estado[1] == f"{client_socket.getsockname()[1]}" and paddle_b.ycor() != int(estado[4]):
+        paddle_b.sety(int(estado[4]))
 
-    if estado[2] == f"{client_socket.getsockname()[1]}" and paddle_a.ycor() != estado[3]:
-        paddle_a.sety(estado[3])
+    if estado[2] == f"{client_socket.getsockname()[1]}" and paddle_a.ycor() != int(estado[3]):
+        paddle_a.sety(int(estado[3]))
     
     # Movimiento de la bola
     ball.setx(ball.xcor() + ball.dx)
