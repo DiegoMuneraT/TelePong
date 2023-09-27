@@ -73,7 +73,7 @@ def paddle_up():
         y = paddle_a.ycor()
         y += 20
         # Se envia el mensaje al servidor con la cabecera (PMD: Paddle Move Down) y la PDU (String con la posición de la raqueta)
-        message = "PM "+str(y)
+        message = "PM"+str(y)
         estado[3] = str(y)
         client_socket.sendto(message.encode(), (constants.SERVER_IP, constants.SERVER_PORT))
         paddle_a.sety(y)
@@ -82,7 +82,7 @@ def paddle_up():
         y = paddle_b.ycor()
         y += 20
         # Se envia el mensaje al servidor con la cabecera (PMD: Paddle Move Down) y la PDU (String con la posición de la raqueta)
-        message = "PM "+str(y)
+        message = "PM"+str(y)
         estado[4] = str(y)
         client_socket.sendto(message.encode(), (constants.SERVER_IP, constants.SERVER_PORT))
         paddle_b.sety(y)
@@ -94,7 +94,7 @@ def paddle_down():
         y = paddle_a.ycor()
         y -= 20
         # Se envia el mensaje al servidor con la cabecera (PMD: Paddle Move Down) y la PDU (String con la posición de la raqueta)
-        message = "PM "+str(y)
+        message = "PM"+str(y)
         client_socket.sendto(message.encode(), (constants.SERVER_IP, constants.SERVER_PORT))
         paddle_a.sety(y)
         
@@ -103,7 +103,7 @@ def paddle_down():
         y = paddle_b.ycor()
         y -= 20
         # Se envia el mensaje al servidor con la cabecera (PMD: Paddle Move Down) y la PDU (String con la posición de la raqueta)
-        message = "PM "+str(y)
+        message = "PM"+str(y)
         client_socket.sendto(message.encode(), (constants.SERVER_IP, constants.SERVER_PORT))
         paddle_b.sety(y)
 
@@ -115,17 +115,25 @@ def receive_state(client_socket):
             print(f"Server: {data.decode()}")
             estado = data.decode().split(",")
 
-            # player = f"{client_socket.getsockname()[1]}"
+            player = f"{client_socket.getsockname()[1]}"
 
-            # print(estado)
-            # print(player)
+            print(estado)
+            print(player)
 
             # Asignarle las direcciones a los jugadores
-            # if estado[1] is not None and estado[2] != "":
-                # print("Ambos jugadores conectados")
+            if estado[1] is not None and estado[2] != "0000":
+                print("Ambos jugadores conectados")
 
         except socket.error as e:
             pass
+
+# Actualizar la posición de las raquetas
+def update_paddle():
+    if estado[1] == f"{client_socket.getsockname()[1]}" and paddle_b.ycor() != int(estado[4]):
+        paddle_b.sety(int(estado[4]))
+
+    if estado[2] == f"{client_socket.getsockname()[1]}" and paddle_a.ycor() != int(estado[3]):
+        paddle_a.sety(int(estado[3]))
 
 
 # Start a thread to receive messages from the server
@@ -137,7 +145,7 @@ receive_thread.start()
 message = "Ingreso"
 client_socket.sendto(message.encode(), (constants.SERVER_IP, constants.SERVER_PORT))
 
-while estado[1] is None or estado[2] == "":
+while estado[1] is None or estado[2] == "0000":
     continue
 
 # def paddle_b_up():
@@ -162,17 +170,13 @@ wn.onkeypress(paddle_down, "s")
 # wn.onkeypress(paddle_b_down, "s")
 
 # Loop principal del juego
-while score_a < 5:
+while score_a < 10 and score_b < 10:
 
-    wn.update() 
+    wn.update()    
 
-    if estado[1] == f"{client_socket.getsockname()[1]}" and paddle_b.ycor() != int(estado[4]):
-        paddle_b.sety(int(estado[4]))
-
-    if estado[2] == f"{client_socket.getsockname()[1]}" and paddle_a.ycor() != int(estado[3]):
-        paddle_a.sety(int(estado[3]))
+    update_paddle()
     
-    # Movimiento de la bola
+    # Movimiento de la bolax
     ball.setx(ball.xcor() + ball.dx)
     ball.sety(ball.ycor() + ball.dy)
 

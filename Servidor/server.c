@@ -1,114 +1,156 @@
 #include <stdio.h>
-#include <netdb.h>
-#include <netinet/in.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h> // read(), write(), close()
-#define MAX 80
+#include <unistd.h>
+#include <arpa/inet.h>
+
 #define PORT 8080
-#define SA struct sockaddr
+#define BUFFER_SIZE 1024
 
-// Conexion tomada de Geeks and Geeks
-
-// Function designed for chat between client and server.
-void func(int connfd)
+// Estructura para guardar la información de un cliente
+typedef struct
 {
-	char buff[MAX];
-	int n;
-	// infinite loop for chat
-	for (;;) {
-		bzero(buff, MAX);
+    struct sockaddr_in addr;
+    int hasSentMessage;
+    int hasReceivedMessage;
+} ClientInfo;
 
-		// read the message from client and copy it in buffer
-		read(connfd, buff, sizeof(buff));
-		// print buffer which contains the client contents
-		printf("From client: %s\t To client : ", buff);
-		bzero(buff, MAX);
-		n = 0;
-		// copy server message in the buffer
-		while ((buff[n++] = getchar()) != '\n')
-			;
+// Estructura para guardar la información del juego
+typedef struct {
+    char estado[2];
+    char cliente1[6];
+    char cliente2[6];
+    char raqueta1[5];
+    char raqueta2[5];
+    char pelotaX[4];
+    char pelotaY[4];
+    char puntaje1[3];
+    char puntaje2[3];
+} Game;
 
-		// and send that buffer to client
-		write(connfd, buff, sizeof(buff));
-
-		// if msg contains "Exit" then server exit and chat ended.
-		if (strncmp("exit", buff, 4) == 0) {
-			printf("Server Exit...\n");
-			break;
-		}
-		// if msg contains "move" then server make move.
-		if ((strncmp(buff, "move", 4)) == 0) {
-			printf("server make move...\n");
-			continue;
-		}
-	}
+// Funcion para enviar un mensaje a un cliente
+void sendTextToClient(int sockfd, struct sockaddr_in *client_addr, socklen_t addr_len, Game *game)
+{
+    //printf("Estado: %s, %s, %s", game->estado, game->cliente1, game->cliente2);
+    char message[46];
+    sprintf(message, "%s,%s,%s,%s,%s,%s,%s,%s,%s", game->estado, game->cliente1, game->cliente2, game->raqueta1, game->raqueta2, game->pelotaX, game->pelotaY, game->puntaje1, game->puntaje2);
+    sendto(sockfd, message, strlen(message), 0, (struct sockaddr *)client_addr, addr_len);
 }
 
-// Driver function
-int main()
+// Función para marcar un mensaje recibido por un cliente
+void markReceivedMessage(ClientInfo *client, struct sockaddr_in *client_addr, int sockfd, socklen_t addr_len, Game *game) 
 {
-	int sockfd, connfd;
-	socklen_t len;
-	pid_t childpid;
-	struct sockaddr_in servaddr, cli;
+    printf("Marking message from client %s:%d\n", inet_ntoa(client_addr->sin_addr), ntohs(client_addr->sin_port));
+    client->hasReceivedMessage = 1;
+    client->addr = *client_addr;
+    char port[6] = "";
+    sprintf(port, "%d", ntohs(client_addr->sin_port));
 
-	// socket create and verification
-	sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	if (sockfd == -1) {
-		printf("socket creation failed...\n");
-		exit(0);
-	}
-	else
-		printf("Socket successfully created..\n");
-	bzero(&servaddr, sizeof(servaddr));
+    // Guardamos el puerto del cliente
+    if (strcmp(game->cliente1, "0000") == 0)
+        strcpy(game->cliente1, port);
+    else
+        strcpy(game->cliente2, port);
+    
+    sendTextToClient(sockfd, client_addr, addr_len, game);
+}
 
-	// assign IP, PORT
-	servaddr.sin_family = AF_INET;
-	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	servaddr.sin_port = htons(PORT);
+// Comparar dos direcciones de cliente
+int compareClientAddr(const struct sockaddr_in *addr1, const struct sockaddr_in *addr2) {
+    if (addr1->sin_addr.s_addr == addr2->sin_addr.s_addr && addr1->sin_port == addr2->sin_port)
+        return 1;
+    return 0;
+}
 
-	// Binding newly created socket to given IP and verification
-	if ((bind(sockfd, (SA*)&servaddr, sizeof(servaddr))) != 0) {
-		printf("socket bind failed...\n");
-		exit(0);
-	}
-	else
-		printf("Socket successfully binded..\n");
+// Funcion para recibir un mensaje de un cliente
+void receiveTextFromClient(int sockfd, struct sockaddr_in *client_addr, socklen_t addr_len, char *text, ClientInfo *client1, ClientInfo *client2, Game *game)
+{
+    int len = recvfrom(sockfd, text, BUFFER_SIZE, 0, (struct sockaddr *)client_addr, &addr_len);
 
-	// Now server is ready to listen and verification
-	if ((listen(sockfd, 5)) != 0) {
-		printf("Listen failed...\n");
-		exit(0);
-	}
-	else
-		printf("Server listening..\n");
-	len = sizeof(cli);
+    if (len > 0) {
+        text[len] = '\0';
 
-	while (1)
-	{
-		// Accept the data packet from client and verification
-		connfd = accept(sockfd, (SA *)&cli, &len);
-		if (connfd < 0)
-		{
-			printf("server accept failed...\n");
-			exit(0);
-		}
-		else
-			printf("server accept the client...\n");
+        printf("Received message from client at %s:%d: %s\n", inet_ntoa(client_addr->sin_addr), ntohs(client_addr->sin_port), text);
 
-		// Forking a child process
-		if ((childpid = fork()) == 0)
-		{
-			close(sockfd); // Child process closes listening socket
-			func(connfd);  // Child process handles client request
-			exit(0);	   // Child process exits
-		}
-		close(connfd); // Parent process closes connected socket
-	}
-	// After chatting close the socket
-	close(sockfd);
-	return 0;
+        // Miramos si el servidor recibió un mensaje
+        if (!client1->hasReceivedMessage) {
+            markReceivedMessage(client1, client_addr, sockfd, addr_len, game);
+        } else if (!client2->hasReceivedMessage && !compareClientAddr(&(client1->addr), client_addr)) {
+            strcpy(game->estado, "1");
+            markReceivedMessage(client2, client_addr, sockfd, addr_len, game);
+        }
+
+        if (text[0] == 'P' && text[1] == 'M')
+        {
+            if(client_addr->sin_port == htons(atoi(game->cliente1)))
+            {
+                memcpy(game->raqueta1, &text[2], strlen(text)-1);
+            }
+            else
+            {
+                memcpy(game->raqueta2, &text[2], strlen(text)-1);
+            }
+        }
+    }
+
+}
+
+// Función principal
+int main() {
+
+    // Variables de estado
+
+    int sockfd;
+    struct sockaddr_in server_addr;
+    socklen_t addr_len = sizeof(struct sockaddr_in);
+    char buffer[BUFFER_SIZE];
+
+    Game game = {"0","0000","0000","000","000","000","000","00","00"};
+    
+    // Crear UDP socket
+    if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) 
+    {
+        perror("Socket creation failed");
+        exit(EXIT_FAILURE);
+    }
+
+    memset(&server_addr, 0, sizeof(server_addr));
+
+    // Configurar la dirección del servidor
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = INADDR_ANY;
+    server_addr.sin_port = htons(PORT);
+
+    // Enlazar el socket con la dirección del servidor
+    if (bind(sockfd, (const struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
+        perror("Binding failed");
+        exit(EXIT_FAILURE);
+    }
+
+    printf("Server listening on port %d\n", PORT);
+
+    // Variables para guardar la información de los clientes
+    ClientInfo client1 = {{0}, 0, 0};
+    ClientInfo client2 = {{0}, 0, 0};
+
+    while (1) {
+
+        // Recibir un mensaje de un cliente
+        struct sockaddr_in client_addr;
+
+        // Recibimos el mensaje
+        receiveTextFromClient(sockfd, &client_addr, addr_len, buffer, &client1, &client2, &game);
+
+        // Miramos si ambos clientes ya enviaron un mensaje
+        if (client1.hasReceivedMessage && client2.hasReceivedMessage) {
+            // Mandamos la información a los clientes
+            sendTextToClient(sockfd, &(client1.addr), addr_len, &game);
+            sendTextToClient(sockfd, &(client2.addr), addr_len, &game);
+        }
+
+        
+    }
+
+    close(sockfd);
+    return 0;
 }
