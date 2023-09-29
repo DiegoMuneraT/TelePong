@@ -189,7 +189,7 @@ while score_a < 10 and score_b < 10:
         ball.goto(0, 0)
         ball.dx *= -1
 
-    # Colisiones con las raquetas
+    # Colisiones con las raquetasqq
     if ball.xcor() < -340 and ball.ycor() < paddle_a.ycor() + 50 and ball.ycor() > paddle_a.ycor() - 50:
         ball.dx *= -1 
     
