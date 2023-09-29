@@ -28,6 +28,8 @@ typedef struct {
     char puntaje2[3];
 } Game;
 
+int newMessage = 0;
+
 // Funcion para enviar un mensaje a un cliente
 void sendTextToClient(int sockfd, struct sockaddr_in *client_addr, socklen_t addr_len, Game *game)
 {
@@ -103,6 +105,7 @@ void receiveTextFromClient(int sockfd, struct sockaddr_in *client_addr, socklen_
                 memcpy(game->puntaje2, &text[2], strlen(text)-1);
             }
         }
+        newMessage = 1;
     }
 
 }
@@ -154,10 +157,12 @@ int main() {
         receiveTextFromClient(sockfd, &client_addr, addr_len, buffer, &client1, &client2, &game);
 
         // Miramos si ambos clientes ya enviaron un mensaje
-        if (client1.hasReceivedMessage && client2.hasReceivedMessage) {
+        if (client1.hasReceivedMessage && client2.hasReceivedMessage && newMessage == 1) {
             // Mandamos la información a los clientes
             sendTextToClient(sockfd, &(client1.addr), addr_len, &game);
             sendTextToClient(sockfd, &(client2.addr), addr_len, &game);
+            newMessage = 0;
+            printf("Sent game State: %s,%s,%s,%s,%s,%s,%s,%s,%s", game.estado, game.cliente1, game.cliente2, game.raqueta1, game.raqueta2, game.pelotaX, game.pelotaY, game.puntaje1, game.puntaje2);
         }
 
         
