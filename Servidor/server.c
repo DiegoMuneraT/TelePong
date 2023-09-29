@@ -91,6 +91,18 @@ void receiveTextFromClient(int sockfd, struct sockaddr_in *client_addr, socklen_
                 memcpy(game->raqueta2, &text[2], strlen(text)-1);
             }
         }
+
+        else if (text[0] == 'S' && text[1] == 'C')
+        {
+            if(client_addr->sin_port == htons(atoi(game->cliente1)))
+            {
+                memcpy(game->puntaje1, &text[2], strlen(text)-1);
+            }
+            else
+            {
+                memcpy(game->puntaje2, &text[2], strlen(text)-1);
+            }
+        }
     }
 
 }
