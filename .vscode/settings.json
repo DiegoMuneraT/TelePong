@@ -4,5 +4,6 @@
         "netdb.h": "c",
         "types.h": "c",
         "inet.h": "c"
-    }
+    },
+    "C_Cpp.default.compilerPath": "/usr/bin/gcc"
 }

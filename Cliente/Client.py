@@ -1,6 +1,5 @@
 import turtle
 import time
-#import threading
 # Importamos el módulo de protocolo
 from Protocol import myprotocol as myp
 

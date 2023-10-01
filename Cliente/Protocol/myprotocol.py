@@ -51,14 +51,6 @@ def REQUEST(header, value):
     elif header == 'SCORE':
         send_message(client_socket, 'SC'+str(value))
         
-
-
-
-
-
-
-
-
 """
 
 REQUEST es un método que se encarga de enviar una solicitud al servidor.
