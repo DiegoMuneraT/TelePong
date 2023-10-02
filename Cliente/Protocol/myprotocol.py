@@ -45,7 +45,7 @@ def REQUEST(header, value):
         return 'PADDLE MOVE OK'
     
     elif header == 'PLAYER JOIN':
-        send_message(client_socket, header)
+        send_message(client_socket, 'PLJ')
         return 'PLAYER JOINED'
     
     elif header == 'SCORE':
