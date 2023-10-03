@@ -3,7 +3,8 @@
         "stdlib.h": "c",
         "netdb.h": "c",
         "types.h": "c",
-        "inet.h": "c"
+        "inet.h": "c",
+        "myprotocol.h": "c"
     },
     "C_Cpp.default.compilerPath": "/usr/bin/gcc"
 }

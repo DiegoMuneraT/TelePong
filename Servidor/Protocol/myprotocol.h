@@ -97,8 +97,7 @@ int lookForFreeGame(){
             return i;
         }
     }
-
-    
+    return 0;
 }
 
 
@@ -112,6 +111,7 @@ int lookForClientsGame(struct sockaddr_in *client_addr){
             return i;
         }
     }
+    return 0;
 }
 
 
