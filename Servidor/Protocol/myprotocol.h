@@ -6,7 +6,7 @@
 
 #define PORT 8080
 #define BUFFER_SIZE 1024
-#define NUM_THREADS 5
+#define NUM_THREADS 1
 
 typedef struct{
     struct sockaddr_in addr;
@@ -97,7 +97,7 @@ int lookForFreeGame(){
             return i;
         }
     }
-    return 0;
+    return -1;
 }
 
 
@@ -111,7 +111,7 @@ int lookForClientsGame(struct sockaddr_in *client_addr){
             return i;
         }
     }
-    return 0;
+    return -1;
 }
 
 
@@ -161,44 +161,51 @@ void receiveTextFromClient(int sockfd, struct sockaddr_in *client_addr, socklen_
         }else{
             gameIndex = lookForClientsGame(client_addr);
         }
+        
+        printf("Received message from client at %s:%d: %s\n", inet_ntoa(client_addr->sin_addr), ntohs(client_addr->sin_port), text);
+
+        // Ver si existe un juego
+        if (gameIndex != -1){
+
+            if (!games[gameIndex].clients[0].hasReceivedMessage)
+            {
+                markReceivedMessage(&games[gameIndex].clients[0], client_addr, sockfd, addr_len, &games[gameIndex].game_data);
+            }
+            else if (!games[gameIndex].clients[1].hasReceivedMessage && !compareClientAddr(&(games[gameIndex].clients[0].addr), client_addr))
+            {
+                strcpy(games[gameIndex].game_data.estado, "1");
+                games[gameIndex].is_active = 1;
+                markReceivedMessage(&games[gameIndex].clients[1], client_addr, sockfd, addr_len, &games[gameIndex].game_data);
+            }
+
+            if (text[0] == 'P' && text[1] == 'M')
+            {
+                if (client_addr->sin_port == htons(atoi(games[gameIndex].game_data.cliente1)))
+                {
+                    memcpy(games[gameIndex].game_data.raqueta1, &text[2], strlen(text) - 1);
+                }
+                else
+                {
+                    memcpy(games[gameIndex].game_data.raqueta2, &text[2], strlen(text) - 1);
+                }
+            }
+            else if (text[0] == 'S' && text[1] == 'C')
+            {
+                if (client_addr->sin_port == htons(atoi(games[gameIndex].game_data.cliente1)))
+                {
+                    memcpy(games[gameIndex].game_data.puntaje1, &text[2], strlen(text) - 1);
+                }
+                else
+                {
+                    memcpy(games[gameIndex].game_data.puntaje2, &text[2], strlen(text) - 1);
+                }
+            }
+            games[gameIndex].newMessage = 1;
+        } else{
+            printf("No hay juegos disponibles.\n");
+        }
 
 
-        // printf("Received message from client at %s:%d: %s\n", inet_ntoa(client_addr->sin_addr), ntohs(client_addr->sin_port), text);
-
-        if (!games[gameIndex].clients[0].hasReceivedMessage)
-        {
-            markReceivedMessage(&games[gameIndex].clients[0], client_addr, sockfd, addr_len, &games[gameIndex].game_data);
-        }
-        else if (!games[gameIndex].clients[1].hasReceivedMessage && !compareClientAddr(&(games[gameIndex].clients[0].addr), client_addr))
-        {
-            strcpy(games[gameIndex].game_data.estado, "1");
-            games[gameIndex].is_active = 1;
-            markReceivedMessage(&games[gameIndex].clients[1], client_addr, sockfd, addr_len, &games[gameIndex].game_data);
-        }
-
-        if (text[0] == 'P' && text[1] == 'M')
-        {
-            if (client_addr->sin_port == htons(atoi(games[gameIndex].game_data.cliente1)))
-            {
-                memcpy(games[gameIndex].game_data.raqueta1, &text[2], strlen(text) - 1);
-            }
-            else
-            {
-                memcpy(games[gameIndex].game_data.raqueta2, &text[2], strlen(text) - 1);
-            }
-        }
-        else if (text[0] == 'S' && text[1] == 'C')
-        {
-            if (client_addr->sin_port == htons(atoi(games[gameIndex].game_data.cliente1)))
-            {
-                memcpy(games[gameIndex].game_data.puntaje1, &text[2], strlen(text) - 1);
-            }
-            else
-            {
-                memcpy(games[gameIndex].game_data.puntaje2, &text[2], strlen(text) - 1);
-            }
-        }
-        games[gameIndex].newMessage = 1;
     }
 }
 
@@ -240,7 +247,7 @@ void REQUEST(char *header, char value)
     } else if (header[0] == 'S' && header[1] == 'N' && header[2] == 'D'){
         struct sockaddr_in client_addr;
         int clientsGame = lookForClientsGame(&client_addr);
-        if (games[clientsGame].clients[0].hasReceivedMessage && games[clientsGame].clients[1].hasReceivedMessage && games[clientsGame].newMessage == 1) {
+        if (clientsGame != -1 && games[clientsGame].clients[0].hasReceivedMessage && games[clientsGame].clients[1].hasReceivedMessage && games[clientsGame].newMessage == 1) {
             // Mandamos la información a los clientes
             sendTextToClient(sockfd, &(games[clientsGame].clients[0].addr), addr_len, &games[clientsGame].game_data);
             sendTextToClient(sockfd, &(games[clientsGame].clients[1].addr), addr_len, &games[clientsGame].game_data);
