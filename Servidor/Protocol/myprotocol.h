@@ -6,7 +6,7 @@
 
 #define PORT 8080
 #define BUFFER_SIZE 1024
-#define NUM_THREADS 1
+#define NUM_THREADS 5
 
 typedef struct{
     struct sockaddr_in addr;
