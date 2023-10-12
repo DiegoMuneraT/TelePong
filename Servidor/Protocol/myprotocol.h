@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 
-#define PORT 8080
+#define PORT 0
 #define BUFFER_SIZE 1024
 #define NUM_THREADS 5
 
