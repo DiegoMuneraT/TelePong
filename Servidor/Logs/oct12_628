@@ -1,0 +1,178 @@
+Server listening on port 8080
+Received message from client at 127.0.0.1:59195: PLJ
+Marking message from client at 127.0.0.1:59195 as received
+0,59195,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Received message from client at 127.0.0.1:57629: PLJ
+Marking message from client at 127.0.0.1:57629 as received
+1,59195,57629
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,59195,57629,000,000,000,000,00,00
+1,59195,57629
+Entro a compare client
+Received message from client at 127.0.0.1:59195: SC1
+1,59195,57629
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,59195,57629,000,000,000,000,1,00
+1,59195,57629
+Entro a compare client
+Received message from client at 127.0.0.1:59195: PM-20
+1,59195,57629
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,59195,57629,-20,000,000,000,1,00
+1,59195,57629
+Entro a compare client
+Received message from client at 127.0.0.1:59195: PM-40
+1,59195,57629
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,59195,57629,-40,000,000,000,1,00
+1,59195,57629
+Entro a compare client
+Received message from client at 127.0.0.1:59195: PM-60
+1,59195,57629
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,59195,57629,-60,000,000,000,1,00
+1,59195,57629
+Entro a compare client
+Received message from client at 127.0.0.1:59195: PM-80
+1,59195,57629
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,59195,57629,-80,000,000,000,1,00
+1,59195,57629
+entro al else compare
+Received message from client at 127.0.0.1:57629: SC1
+1,59195,57629
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,59195,57629,-80,000,000,000,1,1
+1,59195,57629
+Entro a compare client
+Received message from client at 127.0.0.1:59195: PM-100
+1,59195,57629
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,59195,57629,-100,000,000,000,1,1
+1,59195,57629
+Entro a compare client
+Received message from client at 127.0.0.1:59195: PM-120
+1,59195,57629
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,59195,57629,-120,000,000,000,1,1
+1,59195,57629
+Entro a compare client
+Received message from client at 127.0.0.1:59195: PM-140
+1,59195,57629
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,59195,57629,-140,000,000,000,1,1
+1,59195,57629
+entro al else compare
+Received message from client at 127.0.0.1:57629: PM20
+1,59195,57629
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,59195,57629,-140,20,000,000,1,1
+1,59195,57629
+entro al else compare
+Received message from client at 127.0.0.1:57629: PM40
+1,59195,57629
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,59195,57629,-140,40,000,000,1,1
+1,59195,57629
+entro al else compare
+Received message from client at 127.0.0.1:57629: PM60
+1,59195,57629
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,59195,57629,-140,60,000,000,1,1
+1,59195,57629
+entro al else compare
+Received message from client at 127.0.0.1:57629: PM80
+1,59195,57629
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,59195,57629,-140,80,000,000,1,1
+1,59195,57629
+entro al else compare
+Received message from client at 127.0.0.1:57629: PM100
+1,59195,57629
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,59195,57629,-140,100,000,000,1,1
+1,59195,57629
+entro al else compare
+Received message from client at 127.0.0.1:57629: PM120
+1,59195,57629
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,59195,57629,-140,120,000,000,1,1
+1,59195,57629
+entro al else compare
+Received message from client at 127.0.0.1:57629: PM140
+1,59195,57629
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,59195,57629,-140,140,000,000,1,1
+1,59195,57629
+entro al else compare
+Received message from client at 127.0.0.1:57629: PM160
+1,59195,57629
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,59195,57629,-140,160,000,000,1,1
+1,59195,57629
+entro al else compare
+Received message from client at 127.0.0.1:57629: PM180
+1,59195,57629
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,59195,57629

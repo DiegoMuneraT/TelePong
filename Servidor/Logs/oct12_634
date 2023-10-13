@@ -1,0 +1,179 @@
+Server listening on port 8080
+Server listening on port 8080
+Received message from client at 127.0.0.1:57651: PLJ
+Marking message from client at 127.0.0.1:57651 as received
+0,57651,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Received message from client at 127.0.0.1:63422: PLJ
+Marking message from client at 127.0.0.1:63422 as received
+1,57651,63422
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,57651,63422,000,000,000,000,00,00
+1,57651,63422
+Entro a compare client
+Received message from client at 127.0.0.1:57651: PM20
+1,57651,63422
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,57651,63422,20,000,000,000,00,00
+1,57651,63422
+Entro a compare client
+Received message from client at 127.0.0.1:57651: PM40
+1,57651,63422
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,57651,63422,40,000,000,000,00,00
+1,57651,63422
+Entro a compare client
+Received message from client at 127.0.0.1:57651: PM60
+1,57651,63422
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,57651,63422,60,000,000,000,00,00
+1,57651,63422
+Entro a compare client
+Received message from client at 127.0.0.1:57651: PM80
+1,57651,63422
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,57651,63422,80,000,000,000,00,00
+1,57651,63422
+Entro a compare client
+Received message from client at 127.0.0.1:57651: PM100
+1,57651,63422
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,57651,63422,100,000,000,000,00,00
+1,57651,63422
+Entro a compare client
+Received message from client at 127.0.0.1:57651: PM80
+1,57651,63422
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,57651,63422,80,000,000,000,00,00
+1,57651,63422
+Entro a compare client
+Received message from client at 127.0.0.1:57651: PM60
+1,57651,63422
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,57651,63422,60,000,000,000,00,00
+1,57651,63422
+Entro a compare client
+Received message from client at 127.0.0.1:57651: SC1
+1,57651,63422
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,57651,63422,60,000,000,000,1,00
+1,57651,63422
+Entro a compare client
+Received message from client at 127.0.0.1:57651: PM40
+1,57651,63422
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,57651,63422,40,000,000,000,1,00
+1,57651,63422
+Entro a compare client
+Received message from client at 127.0.0.1:57651: PM20
+1,57651,63422
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,57651,63422,20,000,000,000,1,00
+1,57651,63422
+Entro a compare client
+Received message from client at 127.0.0.1:57651: PM0
+1,57651,63422
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,57651,63422,0,000,000,000,1,00
+1,57651,63422
+Entro a compare client
+Received message from client at 127.0.0.1:57651: PM-20
+1,57651,63422
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,57651,63422,-20,000,000,000,1,00
+1,57651,63422
+Entro a compare client
+Received message from client at 127.0.0.1:57651: PM-40
+1,57651,63422
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,57651,63422,-40,000,000,000,1,00
+1,57651,63422
+Entro a compare client
+Received message from client at 127.0.0.1:57651: PM-60
+1,57651,63422
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,57651,63422,-60,000,000,000,1,00
+1,57651,63422
+Entro a compare client
+Received message from client at 127.0.0.1:57651: PM-80
+1,57651,63422
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,57651,63422,-80,000,000,000,1,00
+1,57651,63422
+Entro a compare client
+Received message from client at 127.0.0.1:57651: PM-60
+1,57651,63422
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,57651,63422,-60,000,000,000,1,00
+1,57651,63422
+entro al else compare
+Received message from client at 127.0.0.1:63422: SC1
+1,57651,63422
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Sent game State: 1,57651,63422,-60,000,000,000,1,1
+1,57651,63422
+Entro a compare client
+Received message from client at 127.0.0.1:57651: SC2
+1,57651,63422
+0,0000,0000
+0,0000,0000
+0,0000,0000
+0,0000,0000
+Se

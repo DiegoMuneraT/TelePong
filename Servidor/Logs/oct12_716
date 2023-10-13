@@ -1,0 +1,78 @@
+Server listening on port 8080
+Received message from client at 127.0.0.1:49232: PLJ
+Marking message from client at 127.0.0.1:49232 as received
+Received message from client at 127.0.0.1:59777: PLJ
+Marking message from client at 127.0.0.1:59777 as received
+Sent game state: 1,49232,59777,000,000,000,000,00,00
+Received message from client at 127.0.0.1:59777: PM20
+Sent game state: 1,49232,59777,000,20,000,000,00,00
+Received message from client at 127.0.0.1:59777: PM40
+Sent game state: 1,49232,59777,000,40,000,000,00,00
+Received message from client at 127.0.0.1:59777: PM20
+Sent game state: 1,49232,59777,000,20,000,000,00,00
+Received message from client at 127.0.0.1:59777: PM0
+Sent game state: 1,49232,59777,000,0,000,000,00,00
+Received message from client at 127.0.0.1:59777: PM-20
+Sent game state: 1,49232,59777,000,-20,000,000,00,00
+Received message from client at 127.0.0.1:49232: SC1
+Sent game state: 1,49232,59777,000,-20,000,000,1,00
+Received message from client at 127.0.0.1:59777: SC1
+Sent game state: 1,49232,59777,000,-20,000,000,1,1
+Received message from client at 127.0.0.1:49232: SC2
+Sent game state: 1,49232,59777,000,-20,000,000,2,1
+Received message from client at 127.0.0.1:59777: SC2
+Sent game state: 1,49232,59777,000,-20,000,000,2,2
+Received message from client at 127.0.0.1:49232: SC3
+Sent game state: 1,49232,59777,000,-20,000,000,3,2
+Received message from client at 127.0.0.1:49232: PM-20
+Sent game state: 1,49232,59777,-20,-20,000,000,3,2
+Received message from client at 127.0.0.1:49232: PM0
+Sent game state: 1,49232,59777,0,-20,000,000,3,2
+Received message from client at 127.0.0.1:49232: PM20
+Sent game state: 1,49232,59777,20,-20,000,000,3,2
+Received message from client at 127.0.0.1:49232: PM0
+Sent game state: 1,49232,59777,0,-20,000,000,3,2
+Received message from client at 127.0.0.1:49232: PM-20
+Sent game state: 1,49232,59777,-20,-20,000,000,3,2
+Received message from client at 127.0.0.1:49232: PM-40
+Sent game state: 1,49232,59777,-40,-20,000,000,3,2
+Received message from client at 127.0.0.1:49232: PM-60
+Sent game state: 1,49232,59777,-60,-20,000,000,3,2
+Received message from client at 127.0.0.1:49232: PM-80
+Sent game state: 1,49232,59777,-80,-20,000,000,3,2
+Received message from client at 127.0.0.1:49232: PM-100
+Sent game state: 1,49232,59777,-100,-20,000,000,3,2
+Received message from client at 127.0.0.1:49232: PM-120
+Sent game state: 1,49232,59777,-120,-20,000,000,3,2
+Received message from client at 127.0.0.1:49232: PM-140
+Sent game state: 1,49232,59777,-140,-20,000,000,3,2
+Received message from client at 127.0.0.1:49232: PM-160
+Sent game state: 1,49232,59777,-160,-20,000,000,3,2
+Received message from client at 127.0.0.1:49232: PM-180
+Sent game state: 1,49232,59777,-180,-20,000,000,3,2
+Received message from client at 127.0.0.1:49232: PM-200
+Sent game state: 1,49232,59777,-200,-20,000,000,3,2
+Received message from client at 127.0.0.1:49232: PM-220
+Sent game state: 1,49232,59777,-220,-20,000,000,3,2
+Received message from client at 127.0.0.1:59777: PM0
+Sent game state: 1,49232,59777,-220,0,000,000,3,2
+Received message from client at 127.0.0.1:59777: PM20
+Sent game state: 1,49232,59777,-220,20,000,000,3,2
+Received message from client at 127.0.0.1:59777: PM40
+Sent game state: 1,49232,59777,-220,40,000,000,3,2
+Received message from client at 127.0.0.1:59777: PM60
+Sent game state: 1,49232,59777,-220,60,000,000,3,2
+Received message from client at 127.0.0.1:59777: PM80
+Sent game state: 1,49232,59777,-220,80,000,000,3,2
+Received message from client at 127.0.0.1:59777: PM100
+Sent game state: 1,49232,59777,-220,100,000,000,3,2
+Received message from client at 127.0.0.1:59777: PM120
+Sent game state: 1,49232,59777,-220,120,000,000,3,2
+Received message from client at 127.0.0.1:59777: PM140
+Sent game state: 1,49232,59777,-220,140,000,000,3,2
+Received message from client at 127.0.0.1:59777: PM160
+Sent game state: 1,49232,59777,-220,160,000,000,3,2
+Received message from client at 127.0.0.1:59777: PM180
+Sent game state: 1,49232,59777,-220,180,000,000,3,2
+Received message from client at 127.0.0.1:59777: PM200
+Sent game state: 1,49232,59777,

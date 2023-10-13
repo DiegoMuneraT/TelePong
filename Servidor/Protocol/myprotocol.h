@@ -4,9 +4,11 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 
-#define PORT 8080
 #define BUFFER_SIZE 1024
 #define NUM_THREADS 5
+
+int PORT = 0;
+char *logFile = NULL;
 
 typedef struct{
     struct sockaddr_in addr;
@@ -97,7 +99,7 @@ int lookForFreeGame(){
             return i;
         }
     }
-    return -1;
+    return 0;
 }
 
 
@@ -105,13 +107,14 @@ int lookForFreeGame(){
 int lookForClientsGame(struct sockaddr_in *client_addr){
      for (int i = 0; i < NUM_THREADS; i++)
     {
+        //printf("%s,%s,%s\n", games[i].game_data.estado, games[i].game_data.cliente1, games[i].game_data.cliente2);
         if (compareClientAddr(&(games[i].clients[0].addr), client_addr)){
             return i;
         } else if (compareClientAddr(&(games[i].clients[1].addr), client_addr)){
             return i;
         }
     }
-    return -1;
+    return 0;
 }
 
 
@@ -155,9 +158,11 @@ void receiveTextFromClient(int sockfd, struct sockaddr_in *client_addr, socklen_
     {
         printf("Received message from client at %s:%d: %s\n", inet_ntoa(client_addr->sin_addr), ntohs(client_addr->sin_port), text);
 
+
         int gameIndex;
 
         text[len] = '\0';
+
 
         if (text[0] == 'P' && text[1] == 'L' && text[2] == 'J'){
             gameIndex = lookForFreeGame();
@@ -266,7 +271,7 @@ void REQUEST(char *header, char value)
             sendTextToClient(sockfd, &(games[clientsGame].clients[0].addr), addr_len, &games[clientsGame].game_data);
             sendTextToClient(sockfd, &(games[clientsGame].clients[1].addr), addr_len, &games[clientsGame].game_data);
             games[clientsGame].newMessage = 0;
-            printf("Sent game State: %s,%s,%s,%s,%s,%s,%s,%s,%s\n", games[clientsGame].game_data.estado, games[clientsGame].game_data.cliente1, games[clientsGame].game_data.cliente2, games[clientsGame].game_data.raqueta1, games[clientsGame].game_data.raqueta2, games[clientsGame].game_data.pelotaX, games[clientsGame].game_data.pelotaY, games[clientsGame].game_data.puntaje1, games[clientsGame].game_data.puntaje2);
+            printf("Sent game state: %s,%s,%s,%s,%s,%s,%s,%s,%s\n", games[clientsGame].game_data.estado, games[clientsGame].game_data.cliente1, games[clientsGame].game_data.cliente2, games[clientsGame].game_data.raqueta1, games[clientsGame].game_data.raqueta2, games[clientsGame].game_data.pelotaX, games[clientsGame].game_data.pelotaY, games[clientsGame].game_data.puntaje1, games[clientsGame].game_data.puntaje2);
         }
     }
 }

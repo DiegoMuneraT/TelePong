@@ -14,6 +14,8 @@ client_socket.setblocking(0)
 
 client_port = str(client_socket.getsockname()[1])
 
+print(f"Cliente: {client_port} conectado al servidor: {constants.SERVER_IP} en el puerto: {constants.SERVER_PORT}")
+
 def get_client_port():
     return str(client_socket.getsockname()[1])
 
