@@ -5,9 +5,9 @@
 #include <arpa/inet.h>
 
 #define BUFFER_SIZE 1024
-#define NUM_THREADS 5
+#define NUM_THREADS 2
 
-int PORT = 0;
+int PORT = 8080;
 char *logFile = NULL;
 
 typedef struct{
@@ -99,7 +99,7 @@ int lookForFreeGame(){
             return i;
         }
     }
-    return 0;
+    return -1;
 }
 
 
@@ -114,7 +114,7 @@ int lookForClientsGame(struct sockaddr_in *client_addr){
             return i;
         }
     }
-    return 0;
+    return -1;
 }
 
 
@@ -251,7 +251,7 @@ void REQUEST(char *header, char value)
     {
         struct sockaddr_in client_addr;
         int clientsGame = lookForClientsGame(&client_addr);
-        if (clientsGame != -1 && games[clientsGame].is_active == 0 && games[clientsGame].clients[0].hasReceivedMessage && games[clientsGame].clients[1].hasReceivedMessage && games[clientsGame].newMessage == 1) {
+        if (clientsGame != -1 && games[clientsGame].is_active == 0 && games[clientsGame].clients[0].hasReceivedMessage && games[clientsGame].clients[1].hasReceivedMessage) {
             // Mandamos la información a los clientes
             games[clientsGame].is_active = 1;
             sendTextToClient(sockfd, &(games[clientsGame].clients[0].addr), addr_len, &games[clientsGame].game_data);

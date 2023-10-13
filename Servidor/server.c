@@ -4,21 +4,19 @@
 void* handleGame(void* gameIndex) {
     int index = *((int*) gameIndex);
     char charIndex = index + '0';
+    free(gameIndex);
+
     while (1) {
-        // Process game instance with index
-        // ...
-        if (games[index].is_active == 1){
-            printf("obteniendo recursos");
-            // Recibimos el mensaje
-            REQUEST("GET",charIndex);
-            
-            // Enviamos mensaje
-            REQUEST("SND",charIndex);
+        if (games[index].is_active == 1) {
+            // Recibimos y enviamos mensajes
+            REQUEST("GET", charIndex);
+            REQUEST("SND", charIndex);
         }
 
         // Sleep for a short duration (adjust as needed)
-        // usleep(10000);
+        usleep(10000);
     }
+
     return NULL;
 }
 
@@ -40,27 +38,34 @@ int main(int argc, char *argv[]) {
     freopen(logFile, "w", stdout);
     freopen(logFile, "w", stderr);
 
+    // Crear threads para manejar las instancias de juego
+    pthread_t threads[NUM_THREADS];
+
+    for (int i = 0; i < NUM_THREADS; i++) {
+        int *threadIndex = malloc(sizeof(int));
+        if (threadIndex == NULL) {
+            perror("Memory allocation failed");
+            exit(EXIT_FAILURE);
+        }
+
+        *threadIndex = i;
+        if (pthread_create(&threads[i], NULL, handleGame, (void*)threadIndex) != 0) {
+            perror("Thread creation failed");
+            exit(EXIT_FAILURE);
+        }
+    }
+
+
     //Inicializar la comunicación
     startCommunication();
     
     //Inicializar instancias de juego
     initilizeInstances();
-    
-    // Crear threads para manejar las instancias de juego
-    pthread_t threads[NUM_THREADS];
-
-    for (int i = 0; i < NUM_THREADS; i++) {
-       pthread_create(&threads[i], NULL, handleGame, (void*)&i);
-    }
 
     while (1) {
-
-        // Recibimos el mensaje
-        REQUEST("GET",'N');
-
-        // Enviamos mensaje
-        REQUEST("SND",'N');
-
+        // Recibimos y enviamos mensajes
+        REQUEST("GET", 'N');
+        REQUEST("SND", 'N');
     }
 
     endCommunication();
@@ -70,3 +75,5 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
+
+
