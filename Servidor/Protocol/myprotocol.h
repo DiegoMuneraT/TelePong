@@ -44,7 +44,7 @@ char buffer[BUFFER_SIZE];
 // Variables para guardar la información de los clientes
 GameInstance games[NUM_THREADS];
 
-
+// Inicializador instancias de juego
 void initializeGameInstance(GameInstance *gameInstance) {
     ClientInfo client = {
         .addr = {0},
@@ -71,8 +71,8 @@ void initializeGameInstance(GameInstance *gameInstance) {
     gameInstance->game_data = game_data;
 }
 
-
-void initilizeInstances(){
+// Inicializa todas las instancias dependiento del número de hilos
+void initializeInstances(){
     for (int i = 0; i < NUM_THREADS; i++)
     {
         initializeGameInstance(&games[i]);
@@ -91,7 +91,7 @@ int compareClientAddr(const struct sockaddr_in *addr1, const struct sockaddr_in 
 }
 
 
-// Función para buscar un juego libre
+// Buscar un juego libre
 int lookForFreeGame(){
     for (int i = 0; i < NUM_THREADS; i++)
     {
@@ -103,7 +103,7 @@ int lookForFreeGame(){
 }
 
 
-// Función para buscar el juego del cliente
+// Buscar el juego del cliente
 int lookForClientsGame(struct sockaddr_in *client_addr){
      for (int i = 0; i < NUM_THREADS; i++)
     {
@@ -118,7 +118,7 @@ int lookForClientsGame(struct sockaddr_in *client_addr){
 }
 
 
-// Funcion para enviar un mensaje a un cliente
+// Enviar un mensaje a un cliente
 void sendTextToClient(int sockfd, struct sockaddr_in *client_addr, socklen_t addr_len, Game *game)
 {
     char message[46];
@@ -127,7 +127,7 @@ void sendTextToClient(int sockfd, struct sockaddr_in *client_addr, socklen_t add
 }
 
 
-// Funcion para marcar un mensaje recibido por un cliente
+// Marcar un mensaje recibido por un cliente
 void markReceivedMessage(ClientInfo *client, struct sockaddr_in *client_addr, int sockfd, socklen_t addr_len, Game *game)
 {
     printf("Marking message from client at %s:%d as received\n", inet_ntoa(client_addr->sin_addr), ntohs(client_addr->sin_port));
@@ -149,8 +149,8 @@ void markReceivedMessage(ClientInfo *client, struct sockaddr_in *client_addr, in
 }
 
 
-// Funcion para recibir un mensaje de un cliente
-void receiveTextFromClient(int sockfd, struct sockaddr_in *client_addr, socklen_t addr_len, char *text, int newClient, int clientsGame)
+// Recibir un mensaje de un cliente
+void receiveTextFromClient(int sockfd, struct sockaddr_in *client_addr, socklen_t addr_len, char *text, int clientsGame)
 {
     int len = recvfrom(sockfd, text, BUFFER_SIZE, 0, (struct sockaddr *)client_addr, &addr_len);
 
@@ -181,7 +181,7 @@ void receiveTextFromClient(int sockfd, struct sockaddr_in *client_addr, socklen_
             } else {
                 printf("No hay juegos disponibles");
             }
-        }else if (newClient == 0){
+        }else {
             
             gameIndex = clientsGame;
 
@@ -212,6 +212,7 @@ void receiveTextFromClient(int sockfd, struct sockaddr_in *client_addr, socklen_
     }
 }
 
+// Iniciar socket
 void startCommunication(){
     // Crear UDP socket
     if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) 
@@ -236,17 +237,19 @@ void startCommunication(){
     printf("Server listening on port %d\n", PORT);
 }
 
+// Terminar socket
 void endCommunication(){
     printf("Closing communication on port %d\n", PORT);
     close(sockfd);
 }
 
+// Protocolo
 void REQUEST(char *header, char value)
 {
     if(header[0] == 'G' && header[1] == 'E' && header[2] == 'T' && value == 'N')
     {
         struct sockaddr_in client_addr;
-        receiveTextFromClient(sockfd, &client_addr, addr_len, buffer, 1,0);
+        receiveTextFromClient(sockfd, &client_addr, addr_len, buffer, 0);
     } else if (header[0] == 'S' && header[1] == 'N' && header[2] == 'D' && value == 'N')
     {
         struct sockaddr_in client_addr;
@@ -262,8 +265,8 @@ void REQUEST(char *header, char value)
     } else if (header[0] == 'G' && header[1] == 'E' && header[2] == 'T' && value != 'N')
     {
         int clientsGame = value - '0';
-        receiveTextFromClient(sockfd,&(games[clientsGame].clients[0].addr),addr_len,buffer, 0, clientsGame);
-        receiveTextFromClient(sockfd,&(games[clientsGame].clients[1].addr),addr_len,buffer, 0, clientsGame);
+        receiveTextFromClient(sockfd,&(games[clientsGame].clients[0].addr),addr_len,buffer, clientsGame);
+        receiveTextFromClient(sockfd,&(games[clientsGame].clients[1].addr),addr_len,buffer, clientsGame);
     } else if (header[0] == 'S' && header[1] == 'N' && header[2] == 'D' && value != 'N')
     {
         int clientsGame = value - '0';

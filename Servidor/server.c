@@ -1,6 +1,8 @@
 #include "Protocol/myprotocol.h"
 #include <pthread.h>
 
+
+// Función que se ejecuta en los threads
 void* handleGame(void* gameIndex) {
     int index = *((int*) gameIndex);
     char charIndex = index + '0';
@@ -13,8 +15,8 @@ void* handleGame(void* gameIndex) {
             REQUEST("SND", charIndex);
         }
 
-        // Sleep for a short duration (adjust as needed)
-        usleep(10000);
+        // Sleep por algun periodo de tiempo
+        // usleep(10000);
     }
 
     return NULL;
@@ -56,11 +58,11 @@ int main(int argc, char *argv[]) {
     }
 
 
-    //Inicializar la comunicación
+    // Inicializar la comunicación
     startCommunication();
     
-    //Inicializar instancias de juego
-    initilizeInstances();
+    // Inicializar instancias de juego
+    initializeInstances();
 
     while (1) {
         // Recibimos y enviamos mensajes
@@ -68,8 +70,11 @@ int main(int argc, char *argv[]) {
         REQUEST("SND", 'N');
     }
 
+    // Terminamos socket
     endCommunication();
-     for (int i = 0; i < NUM_THREADS; i++) {
+
+    // Terminamos los threads
+    for (int i = 0; i < NUM_THREADS; i++) {
         pthread_join(threads[i], NULL);
     }
 
