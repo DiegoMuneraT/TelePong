@@ -7,12 +7,20 @@ void* handleGame(void* gameIndex) {
     int index = *((int*) gameIndex);
     char charIndex = index + '0';
     free(gameIndex);
+    printf("Thread: %d",index);
 
     while (1) {
+        int count = 0;
         if (games[index].is_active == 1) {
             // Recibimos y enviamos mensajes
-            REQUEST("GET", charIndex);
-            REQUEST("SND", charIndex);
+            REQUEST("MSG", charIndex);
+            REQUEST("UPD", charIndex);
+        }else{
+            if (count < 2){
+                REQUEST("GET", 'N');
+                REQUEST("SND", 'N');
+                count++;
+            }
         }
 
         // Sleep por algun periodo de tiempo
@@ -26,19 +34,25 @@ void* handleGame(void* gameIndex) {
 // Función principal
 int main(int argc, char *argv[]) {
 
-    if(argc != 3){
-        fprintf(stderr, "Uso: %s <PORT> <LogFile>\n", argv[0]);
-        exit(EXIT_FAILURE);
-    }
+    // if(argc != 3){
+    //     fprintf(stderr, "Uso: %s <PORT> <LogFile>\n", argv[0]);
+    //     exit(EXIT_FAILURE);
+    // }
 
-    // Guardar el puerto y el archivo de log
-    PORT = atoi(argv[1]);
-    char logFile[256];
-    sprintf(logFile, "Logs/%s", argv[2]);
+    // // Guardar el puerto y el archivo de log
+    // PORT = atoi(argv[1]);
+    // char logFile[256];
+    // sprintf(logFile, "Logs/%s", argv[2]);
 
-    // Redirigir las salidas al archivo de log
-    freopen(logFile, "w", stdout);
-    freopen(logFile, "w", stderr);
+    // // Redirigir las salidas al archivo de log
+    // freopen(logFile, "w", stdout);
+    // freopen(logFile, "w", stderr);
+
+    // Inicializar la comunicación
+    startCommunication();
+    
+    // Inicializar instancias de juego
+    initializeInstances();
 
     // Crear threads para manejar las instancias de juego
     pthread_t threads[NUM_THREADS];
@@ -57,17 +71,12 @@ int main(int argc, char *argv[]) {
         }
     }
 
-
-    // Inicializar la comunicación
-    startCommunication();
-    
-    // Inicializar instancias de juego
-    initializeInstances();
-
+    // Me esta dañando el hilo
     while (1) {
         // Recibimos y enviamos mensajes
-        REQUEST("GET", 'N');
-        REQUEST("SND", 'N');
+        // REQUEST("GET", 'N');
+        // REQUEST("SND", 'N');
+        usleep(10000);
     }
 
     // Terminamos socket
