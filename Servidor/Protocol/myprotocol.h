@@ -5,7 +5,7 @@
 #include <arpa/inet.h>
 
 #define BUFFER_SIZE 1024
-#define NUM_THREADS 1
+#define NUM_THREADS 2
 
 int PORT = 8080;
 char *logFile = NULL;
@@ -178,7 +178,6 @@ void receiveTextFromClient(int sockfd, struct sockaddr_in *client_addr, socklen_
                     strcpy(games[gameIndex].game_data.estado, "1");
                     markReceivedMessage(&games[gameIndex].clients[1], client_addr, sockfd, addr_len, &games[gameIndex].game_data);
                 }
-                games[gameIndex].newMessage = 1;
             } else {
                 printf("No hay juegos disponibles");
             }
@@ -250,13 +249,11 @@ void REQUEST(char *header, char value)
 
     if(header[0] == 'G' && header[1] == 'E' && header[2] == 'T' && value == 'N')
     {// Obtener mensaje de cliente nuevo y asignarle un juego
-        printf("Entro 1\n");
         struct sockaddr_in client_addr;
         receiveTextFromClient(sockfd, &client_addr, addr_len, buffer, 0);
     } else if (header[0] == 'S' && header[1] == 'N' && header[2] == 'D' && value == 'N')
     {
         // Enviar primer estado a los nuevos clientes y empezar juego
-        printf("Entro 2\n");
         struct sockaddr_in client_addr;
         int clientsGame = lookForClientsGame(&client_addr);
         if (clientsGame != -1 && games[clientsGame].is_active == 0 && games[clientsGame].clients[0].hasReceivedMessage && games[clientsGame].clients[1].hasReceivedMessage) {
@@ -270,15 +267,12 @@ void REQUEST(char *header, char value)
     } else if (header[0] == 'M' && header[1] == 'S' && header[2] == 'G')
     {
         // Recibir mensaje de ambos clientes con juego ya asignado
-        printf("Entro 3\n");
+        struct sockaddr_in client_addr;
         int clientsGame = value - '0';
-        // AQUÍ ESTA EL ERROR
-        receiveTextFromClient(sockfd,&(games[clientsGame].clients[0].addr),addr_len,buffer, clientsGame);
-        // receiveTextFromClient(sockfd,&(games[clientsGame].clients[1].addr),addr_len,buffer, clientsGame);
+        receiveTextFromClient(sockfd,&client_addr,addr_len,buffer, clientsGame);
     } else if (header[0] == 'U' && header[1] == 'P' && header[2] == 'D')
     {
         // Enviar estado a clientes con juego ya asignado
-        printf("Entro 4\n");
         int clientsGame = value - '0';
         if (games[clientsGame].newMessage == 1){
             sendTextToClient(sockfd, &(games[clientsGame].clients[0].addr), addr_len, &games[clientsGame].game_data);

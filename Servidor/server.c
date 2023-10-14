@@ -16,11 +16,8 @@ void* handleGame(void* gameIndex) {
             REQUEST("MSG", charIndex);
             REQUEST("UPD", charIndex);
         }else{
-            if (count < 2){
-                REQUEST("GET", 'N');
-                REQUEST("SND", 'N');
-                count++;
-            }
+            REQUEST("GET", 'N');
+            REQUEST("SND", 'N');
         }
 
         // Sleep por algun periodo de tiempo
