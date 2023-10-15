@@ -129,7 +129,7 @@ def main():
             ball.sety(ball.ycor() + ball.dy)
             myp.REQUEST("BALLX", ball.xcor())
             myp.REQUEST("BALLY", ball.ycor())
-        else:
+        elif estado[2] == myp.client_server_port:
             ball.setx(int(estado[5]))
             ball.sety(int(estado[6]))
 
