@@ -18,6 +18,8 @@ Variables de estado
 8: Puntaje B
 
 """
+
+
 def main():
     estado = myp.REQUEST("GET", "STATE")
 
@@ -72,8 +74,9 @@ def main():
     pen.penup()
     pen.hideturtle()
     pen.goto(0, 260)
-    pen.write("Cliente A: 0  Cliente B: 0", align="center", font=("Courier", 24, "normal"))
-
+    pen.write(
+        "Cliente A: 0  Cliente B: 0", align="center", font=("Courier", 24, "normal")
+    )
 
     # Movimiento de las raquetas
     def paddle_up():
@@ -91,7 +94,6 @@ def main():
             myp.REQUEST("PADDLE", str(y))
             paddle_b.sety(y)
 
-
     def paddle_down():
         if estado[1] == myp.client_server_port:
             y = paddle_a.ycor()
@@ -107,11 +109,10 @@ def main():
             myp.REQUEST("PADDLE", str(y))
             paddle_b.sety(y)
 
-
     # Actualizar la posición de las raquetas
     def update_paddle():
         estado = myp.REQUEST("GET", "STATE")
-        #print(estado)
+        # print(estado)
 
         if estado[1] == myp.client_server_port and paddle_b.ycor() != int(estado[4]):
             paddle_b.sety(int(estado[4]))
@@ -119,16 +120,12 @@ def main():
         if estado[2] == myp.client_server_port and paddle_a.ycor() != int(estado[3]):
             paddle_a.sety(int(estado[3]))
 
-
     def update_score():
         estado = myp.REQUEST("GET", "STATE")
 
-        if estado[1] == myp.client_server_port and score_a != int(estado[7]):
+        if estado[2] == myp.client_server_port:
             score_a = int(estado[7])
-
-        if estado[2] == myp.client_server_port and score_b != int(estado[8]):
             score_b = int(estado[8])
-
 
     def update_ball():
         estado = myp.REQUEST("GET", "STATE")
@@ -145,7 +142,6 @@ def main():
 
         # ball.setx(ball.xcor() + ball.dx)
         # ball.sety(ball.ycor() + ball.dy)
-
 
     while estado[1] is None or estado[2] == "0000":
         estado = myp.REQUEST("GET", "STATE")
@@ -164,17 +160,18 @@ def main():
     wn.onkeypress(paddle_up, "w")
     wn.onkeypress(paddle_down, "s")
 
-
     # Loop principal del juego
     while score_a < 10 and score_b < 10:
         wn.update()
 
-        if(wn.onkeypress(paddle_up, "w")):
+        if wn.onkeypress(paddle_up, "w"):
             print("w")
 
         update_paddle()
 
         update_ball()
+
+        update_score()
 
         if estado[1] == myp.client_server_port:
             # Bordes
@@ -240,6 +237,7 @@ def main():
     # Close the socket and wait for the receive thread to finish
     myp.client_socket.close()
     myp.thread.join()
+
 
 if __name__ == "__main__":
     main()
