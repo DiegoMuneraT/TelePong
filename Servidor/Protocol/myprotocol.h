@@ -7,7 +7,7 @@
 #define BUFFER_SIZE 1024
 #define NUM_THREADS 2
 
-int PORT = 0;
+int PORT = 8080;
 char *logFile = NULL;
 
 typedef struct{
@@ -274,6 +274,8 @@ void REQUEST(char *header, char value)
             games[clientsGame].is_active = 1;
             sendPortToClient(sockfd[0], &(games[clientsGame].clients[0].addr), addr_len, games[clientsGame].port);
             sendPortToClient(sockfd[0], &(games[clientsGame].clients[1].addr), addr_len, games[clientsGame].port);
+            sendStateToClient(sockfd[0], &(games[clientsGame].clients[0].addr), addr_len, &games[clientsGame].game_data);
+            sendStateToClient(sockfd[0], &(games[clientsGame].clients[1].addr), addr_len, &games[clientsGame].game_data);
             games[clientsGame].newMessage = 0;
             printf("Sent first game State to port %d: %s,%s,%s,%s,%s,%s,%s,%s,%s\n", games[clientsGame].port, games[clientsGame].game_data.estado, games[clientsGame].game_data.cliente1, games[clientsGame].game_data.cliente2, games[clientsGame].game_data.raqueta1, games[clientsGame].game_data.raqueta2, games[clientsGame].game_data.pelotaX, games[clientsGame].game_data.pelotaY, games[clientsGame].game_data.puntaje1, games[clientsGame].game_data.puntaje2);
         }
