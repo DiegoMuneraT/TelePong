@@ -7,7 +7,7 @@
 #define BUFFER_SIZE 1024
 #define NUM_THREADS 2
 
-int PORT = 8080;
+int PORT = 0;
 char *logFile = NULL;
 
 typedef struct{
@@ -20,10 +20,10 @@ typedef struct {
     char estado[2];
     char cliente1[6];
     char cliente2[6];
-    char raqueta1[5];
-    char raqueta2[5];
-    char pelotaX[4];
-    char pelotaY[4];
+    char raqueta1[6];
+    char raqueta2[6];
+    char pelotaX[5];
+    char pelotaY[5];
     char puntaje1[3];
     char puntaje2[3];
 } Game;
@@ -31,13 +31,14 @@ typedef struct {
 typedef struct{
     int is_active;
     int newMessage;
+    int port;
     ClientInfo clients[2];
     Game game_data;
 } GameInstance;
 
 // Variables socket
-int sockfd;
-struct sockaddr_in server_addr;
+int sockfd[NUM_THREADS+1];
+struct sockaddr_in server_addr[NUM_THREADS+1];
 socklen_t addr_len = sizeof(struct sockaddr_in);
 char buffer[BUFFER_SIZE];
 
@@ -45,7 +46,7 @@ char buffer[BUFFER_SIZE];
 GameInstance games[NUM_THREADS];
 
 // Inicializador instancias de juego
-void initializeGameInstance(GameInstance *gameInstance) {
+void initializeGameInstance(GameInstance *gameInstance, int i) {
     ClientInfo client = {
         .addr = {0},
         .hasSentMessage = 0,
@@ -66,6 +67,7 @@ void initializeGameInstance(GameInstance *gameInstance) {
 
     gameInstance->is_active = 0;
     gameInstance->newMessage = 0;
+    gameInstance->port = PORT + i + 1;
     gameInstance->clients[0] = client;
     gameInstance->clients[1] = client;
     gameInstance->game_data = game_data;
@@ -75,7 +77,7 @@ void initializeGameInstance(GameInstance *gameInstance) {
 void initializeInstances(){
     for (int i = 0; i < NUM_THREADS; i++)
     {
-        initializeGameInstance(&games[i]);
+        initializeGameInstance(&games[i],i);
     }
 }
 
@@ -119,10 +121,18 @@ int lookForClientsGame(struct sockaddr_in *client_addr){
 
 
 // Enviar un mensaje a un cliente
-void sendTextToClient(int sockfd, struct sockaddr_in *client_addr, socklen_t addr_len, Game *game)
+void sendStateToClient(int sockfd, struct sockaddr_in *client_addr, socklen_t addr_len, Game *game)
+{
+    char message[48];
+    sprintf(message, "state:%s,%s,%s,%s,%s,%s,%s,%s,%s", game->estado, game->cliente1, game->cliente2, game->raqueta1, game->raqueta2, game->pelotaX, game->pelotaY, game->puntaje1, game->puntaje2);
+    sendto(sockfd, message, strlen(message), 0, (struct sockaddr *)client_addr, addr_len);
+}
+
+// Enviar el puerto a un cliente
+void sendPortToClient(int sockfd, struct sockaddr_in *client_addr, socklen_t addr_len, int port)
 {
     char message[46];
-    sprintf(message, "%s,%s,%s,%s,%s,%s,%s,%s,%s", game->estado, game->cliente1, game->cliente2, game->raqueta1, game->raqueta2, game->pelotaX, game->pelotaY, game->puntaje1, game->puntaje2);
+    sprintf(message, "port:%d",port);
     sendto(sockfd, message, strlen(message), 0, (struct sockaddr *)client_addr, addr_len);
 }
 
@@ -144,7 +154,7 @@ void markReceivedMessage(ClientInfo *client, struct sockaddr_in *client_addr, in
     {
         strcpy(game->cliente2, port);
     }
-    sendTextToClient(sockfd, client_addr, addr_len, game);
+    sendStateToClient(sockfd, client_addr, addr_len, game);
 
 }
 
@@ -191,7 +201,7 @@ void receiveTextFromClient(int sockfd, struct sockaddr_in *client_addr, socklen_
                 {
                     memcpy(games[gameIndex].game_data.raqueta1, &text[2], strlen(text) - 1);
                 }
-                else
+                else if (client_addr->sin_port == htons(atoi(games[gameIndex].game_data.cliente2)))
                 {
                     memcpy(games[gameIndex].game_data.raqueta2, &text[2], strlen(text) - 1);
                 }
@@ -202,10 +212,14 @@ void receiveTextFromClient(int sockfd, struct sockaddr_in *client_addr, socklen_
                 {
                     memcpy(games[gameIndex].game_data.puntaje1, &text[2], strlen(text) - 1);
                 }
-                else
+                else if (client_addr->sin_port == htons(atoi(games[gameIndex].game_data.cliente2)))
                 {
                     memcpy(games[gameIndex].game_data.puntaje2, &text[2], strlen(text) - 1);
                 }
+            } else if (text[0] == 'B' && text[1] == 'X'){
+                memcpy(games[gameIndex].game_data.pelotaX, &text[2], strlen(text) - 1);
+            } else if (text[0] == 'B' && text[1] == 'Y'){
+                memcpy(games[gameIndex].game_data.pelotaY, &text[2], strlen(text) - 1);
             }
             games[gameIndex].newMessage = 1;
         }
@@ -213,32 +227,31 @@ void receiveTextFromClient(int sockfd, struct sockaddr_in *client_addr, socklen_
 }
 
 // Iniciar socket
-void startCommunication(){
+void startCommunication(int port, int *sockfd, struct sockaddr_in *server_addr) {
     // Crear UDP socket
-    if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) 
-    {
+    if ((*sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
         perror("Socket creation failed");
         exit(EXIT_FAILURE);
     }
 
-    memset(&server_addr, 0, sizeof(server_addr));
+    memset(server_addr, 0, sizeof(*server_addr));
 
     // Configurar la dirección del servidor
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_addr.s_addr = INADDR_ANY;
-    server_addr.sin_port = htons(PORT);
+    server_addr->sin_family = AF_INET;
+    server_addr->sin_addr.s_addr = INADDR_ANY;
+    server_addr->sin_port = htons(port);
 
     // Enlazar el socket con la dirección del servidor
-    if (bind(sockfd, (const struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
+    if (bind(*sockfd, (const struct sockaddr *)server_addr, sizeof(*server_addr)) < 0) {
         perror("Binding failed");
         exit(EXIT_FAILURE);
     }
 
-    printf("Server listening on port %d\n", PORT);
+    printf("Server listening on port %d\n", port);
 }
 
 // Terminar socket
-void endCommunication(){
+void endCommunication(int sockfd){
     printf("Closing communication on port %d\n", PORT);
     close(sockfd);
 }
@@ -247,11 +260,11 @@ void endCommunication(){
 void REQUEST(char *header, char value)
 {
 
-    if(header[0] == 'G' && header[1] == 'E' && header[2] == 'T' && value == 'N')
+    if(header[0] == 'G' && header[1] == 'E' && header[2] == 'T')
     {// Obtener mensaje de cliente nuevo y asignarle un juego
         struct sockaddr_in client_addr;
-        receiveTextFromClient(sockfd, &client_addr, addr_len, buffer, 0);
-    } else if (header[0] == 'S' && header[1] == 'N' && header[2] == 'D' && value == 'N')
+        receiveTextFromClient(sockfd[0], &client_addr, addr_len, buffer, 0);
+    } else if (header[0] == 'S' && header[1] == 'N' && header[2] == 'D')
     {
         // Enviar primer estado a los nuevos clientes y empezar juego
         struct sockaddr_in client_addr;
@@ -259,26 +272,26 @@ void REQUEST(char *header, char value)
         if (clientsGame != -1 && games[clientsGame].is_active == 0 && games[clientsGame].clients[0].hasReceivedMessage && games[clientsGame].clients[1].hasReceivedMessage) {
             // Mandamos la información a los clientes
             games[clientsGame].is_active = 1;
-            sendTextToClient(sockfd, &(games[clientsGame].clients[0].addr), addr_len, &games[clientsGame].game_data);
-            sendTextToClient(sockfd, &(games[clientsGame].clients[1].addr), addr_len, &games[clientsGame].game_data);
+            sendPortToClient(sockfd[0], &(games[clientsGame].clients[0].addr), addr_len, games[clientsGame].port);
+            sendPortToClient(sockfd[0], &(games[clientsGame].clients[1].addr), addr_len, games[clientsGame].port);
             games[clientsGame].newMessage = 0;
-            printf("Sent first game State: %s,%s,%s,%s,%s,%s,%s,%s,%s\n", games[clientsGame].game_data.estado, games[clientsGame].game_data.cliente1, games[clientsGame].game_data.cliente2, games[clientsGame].game_data.raqueta1, games[clientsGame].game_data.raqueta2, games[clientsGame].game_data.pelotaX, games[clientsGame].game_data.pelotaY, games[clientsGame].game_data.puntaje1, games[clientsGame].game_data.puntaje2);
+            printf("Sent first game State to port %d: %s,%s,%s,%s,%s,%s,%s,%s,%s\n", games[clientsGame].port, games[clientsGame].game_data.estado, games[clientsGame].game_data.cliente1, games[clientsGame].game_data.cliente2, games[clientsGame].game_data.raqueta1, games[clientsGame].game_data.raqueta2, games[clientsGame].game_data.pelotaX, games[clientsGame].game_data.pelotaY, games[clientsGame].game_data.puntaje1, games[clientsGame].game_data.puntaje2);
         }
     } else if (header[0] == 'M' && header[1] == 'S' && header[2] == 'G')
     {
         // Recibir mensaje de ambos clientes con juego ya asignado
         struct sockaddr_in client_addr;
         int clientsGame = value - '0';
-        receiveTextFromClient(sockfd,&client_addr,addr_len,buffer, clientsGame);
+        receiveTextFromClient(sockfd[clientsGame+1],&client_addr,addr_len,buffer, clientsGame);
     } else if (header[0] == 'U' && header[1] == 'P' && header[2] == 'D')
     {
         // Enviar estado a clientes con juego ya asignado
         int clientsGame = value - '0';
         if (games[clientsGame].newMessage == 1){
-            sendTextToClient(sockfd, &(games[clientsGame].clients[0].addr), addr_len, &games[clientsGame].game_data);
-            sendTextToClient(sockfd, &(games[clientsGame].clients[1].addr), addr_len, &games[clientsGame].game_data);
+            sendStateToClient(sockfd[clientsGame+1], &(games[clientsGame].clients[0].addr), addr_len, &games[clientsGame].game_data);
+            sendStateToClient(sockfd[clientsGame+1], &(games[clientsGame].clients[1].addr), addr_len, &games[clientsGame].game_data);
             games[clientsGame].newMessage = 0;
-            printf("Sent game state: %s,%s,%s,%s,%s,%s,%s,%s,%s\n", games[clientsGame].game_data.estado, games[clientsGame].game_data.cliente1, games[clientsGame].game_data.cliente2, games[clientsGame].game_data.raqueta1, games[clientsGame].game_data.raqueta2, games[clientsGame].game_data.pelotaX, games[clientsGame].game_data.pelotaY, games[clientsGame].game_data.puntaje1, games[clientsGame].game_data.puntaje2);
+            printf("Sent game State to port %d: %s,%s,%s,%s,%s,%s,%s,%s,%s\n", games[clientsGame].port, games[clientsGame].game_data.estado, games[clientsGame].game_data.cliente1, games[clientsGame].game_data.cliente2, games[clientsGame].game_data.raqueta1, games[clientsGame].game_data.raqueta2, games[clientsGame].game_data.pelotaX, games[clientsGame].game_data.pelotaY, games[clientsGame].game_data.puntaje1, games[clientsGame].game_data.puntaje2);
         }
     }
 }

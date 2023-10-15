@@ -6,6 +6,8 @@ import constants
 
 estado = [ 0, None, None, 0, 0, 0, 0, 0, 0]
 
+game_port = 0
+
 # Creamos el socket UDP/IP del cliente
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -20,17 +22,21 @@ def get_client_port():
     return str(client_socket.getsockname()[1])
 
 def receive_state(client_socket):
-    global estado
+    global estado, game_port
     while True:
         try:
             data, server_address = client_socket.recvfrom(constants.MAX_MSG_LEN)
-            estado = data.decode().split(",")
+            rawdata = data.decode().split(":")
+            if rawdata[0] == "state":
+                estado = rawdata[1].split(",")
+            elif rawdata[0] == "port":
+                game_port = int(rawdata[1])
         
         except socket.error as e:
             pass
 
-def send_message(client_socket, message):
-    client_socket.sendto(message.encode(), (constants.SERVER_IP, constants.SERVER_PORT))
+def send_message(client_socket, message, server_port):
+    client_socket.sendto(message.encode(), (constants.SERVER_IP, server_port))
 
 thread = threading.Thread(target=receive_state, args=(client_socket,))
 
@@ -43,15 +49,23 @@ def REQUEST(header, value):
         return estado
     
     elif header == 'PADDLE':
-        send_message(client_socket, 'PM'+str(value))
+        send_message(client_socket, 'PM'+str(value), game_port)
         return 'PADDLE MOVE OK'
     
+    elif header == 'BALLX':
+        send_message(client_socket, 'BX'+str(value), game_port)
+        return 'BALL MOVE OK'
+    
+    elif header == 'BALLY':
+        send_message(client_socket, 'BY'+str(value), game_port)
+        return 'BALL MOVE OK'
+    
     elif header == 'PLAYER JOIN':
-        send_message(client_socket, 'PLJ')
+        send_message(client_socket, 'PLJ', constants.SERVER_PORT)
         return 'PLAYER JOINED'
     
     elif header == 'SCORE':
-        send_message(client_socket, 'SC'+str(value))
+        send_message(client_socket, 'SC'+str(value), game_port)
         
 """
 

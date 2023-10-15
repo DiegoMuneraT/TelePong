@@ -20,6 +20,12 @@ Variables de estado
 estado = myp.REQUEST("GET", "STATE")
 print("Estado grande: ", estado)
 
+myp.thread.start()
+
+myp.REQUEST("PLAYER JOIN", "NULL")
+
+port = myp.REQUEST("GET", "PORT")
+
 # Dibujamos la pantalla
 wn = turtle.Screen()
 wn.title("Pong")
@@ -35,7 +41,7 @@ score_b = 0
 paddle_a = turtle.Turtle()
 paddle_a.speed(0)
 paddle_a.shape("square")
-paddle_a.color("white")
+paddle_a.color("red")
 paddle_a.shapesize(stretch_wid=5,stretch_len=1)
 paddle_a.penup()
 paddle_a.goto(-350, 0)
@@ -44,7 +50,7 @@ paddle_a.goto(-350, 0)
 paddle_b = turtle.Turtle()
 paddle_b.speed(0)
 paddle_b.shape("square")
-paddle_b.color("white")
+paddle_b.color("blue")
 paddle_b.shapesize(stretch_wid=5,stretch_len=1)
 paddle_b.penup()
 paddle_b.goto(350, 0)
@@ -52,7 +58,7 @@ paddle_b.goto(350, 0)
 # Bola
 ball = turtle.Turtle()
 ball.speed(0)
-ball.shape("square")
+ball.shape("circle")
 ball.color("white")
 ball.penup()
 ball.goto(0, 0)
@@ -71,15 +77,14 @@ pen.write("Cliente A: 0  Cliente B: 0", align="center", font=("Courier", 24, "no
 
 # Movimiento de las raquetas
 def paddle_up():
-
-    if estado[1] == myp.REQUEST('GET', 'PORT'):
+    if estado[1] == port:
         y = paddle_a.ycor()
         y += 20
         # Se envia el mensaje al servidor con la cabecera (PM: Paddle Move) y la PDU (String con la posición de la raqueta)
         myp.REQUEST("PADDLE", str(y))
         paddle_a.sety(y)
 
-    elif estado[2] == myp.REQUEST('GET', 'PORT'):
+    elif estado[2] == port:
         y = paddle_b.ycor()
         y += 20
         # Se envia el mensaje al servidor con la cabecera (PM: Paddle Move) y la PDU (String con la posición de la raqueta)
@@ -89,7 +94,7 @@ def paddle_up():
 
 def paddle_down():
     
-    if estado[1] == myp.REQUEST('GET', 'PORT'):
+    if estado[1] == port:
         y = paddle_a.ycor()
         y -= 20
         # Se envia el mensaje al servidor con la cabecera (PM: Paddle Move) y la PDU (String con la posición de la raqueta)
@@ -97,7 +102,7 @@ def paddle_down():
         paddle_a.sety(y)
         
 
-    elif estado[2] == myp.REQUEST('GET', 'PORT'):
+    elif estado[2] == port:
         y = paddle_b.ycor()
         y -= 20
         # Se envia el mensaje al servidor con la cabecera (PM: Paddle Move ) y la PDU (String con la posición de la raqueta)
@@ -109,28 +114,47 @@ def update_paddle():
     estado = myp.REQUEST("GET", "STATE")
     print(estado)
 
-    if estado[1] == myp.REQUEST('GET', 'PORT') and paddle_b.ycor() != int(estado[4]):
+    if estado[1] == port and paddle_b.ycor() != int(estado[4]):
         paddle_b.sety(int(estado[4]))
 
-    if estado[2] == myp.REQUEST('GET', 'PORT') and paddle_a.ycor() != int(estado[3]):
+    if estado[2] == port and paddle_a.ycor() != int(estado[3]):
         paddle_a.sety(int(estado[3]))
 
 def update_score():
     estado = myp.REQUEST("GET", "STATE")
 
-    if estado[1] == myp.REQUEST('GET', 'PORT') and score_a != int(estado[7]):
+    if estado[1] == port and score_a != int(estado[7]):
         score_a = int(estado[7])
 
-    if estado[2] == myp.REQUEST('GET', 'PORT') and score_b != int(estado[8]):
+    if estado[2] == port and score_b != int(estado[8]):
         score_b = int(estado[8])
-    
-myp.thread.start()
 
-myp.REQUEST("PLAYER JOIN", "NULL")
+def update_ball():
+    # estado = myp.REQUEST("GET", "STATE")
+
+    # # Movimiento de la bola
+    # if estado[1] == port:
+    #     ball.setx(ball.xcor() + ball.dx)
+    #     ball.sety(ball.ycor() + ball.dy)
+    #     myp.REQUEST("BALLX", ball.xcor())
+    #     myp.REQUEST("BALLY", ball.ycor())
+    # else:
+    #     ball.setx(int(estado[5]))
+    #     ball.sety(int(estado[6]))
+    
+    ball.setx(ball.xcor() + ball.dx)
+    ball.sety(ball.ycor() + ball.dy)
 
 while estado[1] is None or estado[2] == "0000":
     estado = myp.REQUEST("GET", "STATE")
     continue
+
+if estado[1] == port:
+    paddle_a.color("blue")
+    paddle_b.color("red")
+else:
+    paddle_a.color("red")
+    paddle_b.color("blue")
 
 # Entrada de teclado
 wn.listen()
@@ -138,20 +162,18 @@ wn.listen()
 wn.onkeypress(paddle_up, "w")
 wn.onkeypress(paddle_down, "s")
 
+
 # Loop principal del juego
 while score_a < 10 and score_b < 10:
-    #print(estado)
 
     wn.update()    
 
     update_paddle()
     
-    # Movimiento de la bolax
-    ball.setx(ball.xcor() + ball.dx)
-    ball.sety(ball.ycor() + ball.dy)
-
+    update_ball()
+    
+    # if estado[1] == port:
     # Bordes
-
     # Arriba y abajo
     if ball.ycor() > 290:
         ball.sety(290)
@@ -159,7 +181,7 @@ while score_a < 10 and score_b < 10:
         ball.dy *= -1
 
         #os.system("afplay bounce.wav&")
-    
+
     elif ball.ycor() < -290:
         ball.sety(-290)
         # Esto hace que la bola rebote
@@ -169,7 +191,7 @@ while score_a < 10 and score_b < 10:
     if ball.xcor() > 350:        
         score_a += 1
 
-        if estado[1] == myp.REQUEST('GET', 'PORT'):
+        if estado[1] == port:
             myp.REQUEST("SCORE", str(score_a))
 
         pen.clear()
@@ -180,7 +202,7 @@ while score_a < 10 and score_b < 10:
     elif ball.xcor() < -350:
         score_b += 1
 
-        if estado[2] == myp.REQUEST('GET', 'PORT'):
+        if estado[2] == port:
             myp.REQUEST("SCORE", str(score_b))
 
         pen.clear()
@@ -188,10 +210,10 @@ while score_a < 10 and score_b < 10:
         ball.goto(0, 0)
         ball.dx *= -1
 
-    # Colisiones con las raquetasqq
+    # Colisiones con las raquetas
     if ball.xcor() < -340 and ball.ycor() < paddle_a.ycor() + 50 and ball.ycor() > paddle_a.ycor() - 50:
         ball.dx *= -1 
-    
+
     elif ball.xcor() > 340 and ball.ycor() < paddle_b.ycor() + 50 and ball.ycor() > paddle_b.ycor() - 50:
         ball.dx *= -1
 
