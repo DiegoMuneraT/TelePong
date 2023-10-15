@@ -121,11 +121,18 @@ def main():
             paddle_a.sety(int(estado[3]))
 
     def update_score():
+        global score_a, score_b
         estado = myp.REQUEST("GET", "STATE")
 
         if estado[2] == myp.client_server_port:
             score_a = int(estado[7])
             score_b = int(estado[8])
+        pen.clear()
+        pen.write(
+            "Cliente A: {}  Cliente B: {}".format(score_a, score_b),
+            align="center",
+            font=("Courier", 24, "normal"),
+        )
 
     def update_ball():
         estado = myp.REQUEST("GET", "STATE")
@@ -194,12 +201,6 @@ def main():
 
                 myp.REQUEST("SCOREA", str(score_a))
 
-                pen.clear()
-                pen.write(
-                    "Cliente A: {}  Cliente B: {}".format(score_a, score_b),
-                    align="center",
-                    font=("Courier", 24, "normal"),
-                )
                 ball.goto(0, 0)
                 ball.dx *= -1
 
@@ -208,12 +209,6 @@ def main():
 
                 myp.REQUEST("SCOREB", str(score_b))
 
-                pen.clear()
-                pen.write(
-                    "Cliente A: {}  Cliente B: {}".format(score_a, score_b),
-                    align="center",
-                    font=("Courier", 24, "normal"),
-                )
                 ball.goto(0, 0)
                 ball.dx *= -1
 
