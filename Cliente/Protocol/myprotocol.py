@@ -23,14 +23,11 @@ def get_client_port():
 
 def receive_state(client_socket):
     global estado, game_port, client_server_port
-    print("receive state")
     contador = 0
     while True:
         try:
             data, server_address = client_socket.recvfrom(constants.MAX_MSG_LEN)
             rawdata = data.decode().split(":")
-
-            print(f"Recibido: {rawdata}")
 
             if rawdata[0] == "state":
                 estado = rawdata[1].split(",")
@@ -43,10 +40,7 @@ def receive_state(client_socket):
                     contador+=1
 
             elif rawdata[0] == "port":
-                print(f"Recibido puerto del juego: {rawdata[1]}")
                 game_port = int(rawdata[1])
-
-            
         
         except socket.error:
             pass
@@ -81,12 +75,15 @@ def REQUEST(header, value):
         return 'BALL MOVE OK'
     
     elif header == 'PLAYER JOIN':
-        print("oe")
         send_message(client_socket, 'PLJ', constants.SERVER_PORT)
         return 'PLAYER JOINED'
     
-    elif header == 'SCORE':
-        send_message(client_socket, 'SC'+str(value), game_port)
+    elif header == 'SCOREA':
+        send_message(client_socket, 'SA'+str(value), game_port)
+
+    elif header == 'SCOREB':
+        send_message(client_socket, 'SB'+str(value), game_port)
+
         
 """
 

@@ -20,7 +20,6 @@ Variables de estado
 """
 def main():
     estado = myp.REQUEST("GET", "STATE")
-    print("Estado grande: ", estado)
 
     myp.thread.start()
 
@@ -79,7 +78,6 @@ def main():
     # Movimiento de las raquetas
     def paddle_up():
         if estado[1] == myp.client_server_port:
-            print("oe")
             y = paddle_a.ycor()
             y += 20
             # Se envia el mensaje al servidor con la cabecera (PM: Paddle Move) y la PDU (String con la posición de la raqueta)
@@ -87,7 +85,6 @@ def main():
             paddle_a.sety(y)
 
         elif estado[2] == myp.client_server_port:
-            print("oe")
             y = paddle_b.ycor()
             y += 20
             # Se envia el mensaje al servidor con la cabecera (PM: Paddle Move) y la PDU (String con la posición de la raqueta)
@@ -97,7 +94,6 @@ def main():
 
     def paddle_down():
         if estado[1] == myp.client_server_port:
-            print("oe")
             y = paddle_a.ycor()
             y -= 20
             # Se envia el mensaje al servidor con la cabecera (PM: Paddle Move) y la PDU (String con la posición de la raqueta)
@@ -105,8 +101,6 @@ def main():
             paddle_a.sety(y)
 
         elif estado[2] == myp.client_server_port:
-            print("oe")
-
             y = paddle_b.ycor()
             y -= 20
             # Se envia el mensaje al servidor con la cabecera (PM: Paddle Move ) y la PDU (String con la posición de la raqueta)
@@ -137,20 +131,20 @@ def main():
 
 
     def update_ball():
-        # estado = myp.REQUEST("GET", "STATE")
+        estado = myp.REQUEST("GET", "STATE")
 
-        # # Movimiento de la bola
-        # if estado[1] == port:
-        #     ball.setx(ball.xcor() + ball.dx)
-        #     ball.sety(ball.ycor() + ball.dy)
-        #     myp.REQUEST("BALLX", ball.xcor())
-        #     myp.REQUEST("BALLY", ball.ycor())
-        # else:
-        #     ball.setx(int(estado[5]))
-        #     ball.sety(int(estado[6]))
+        # Movimiento de la bola
+        if estado[1] == myp.client_server_port:
+            ball.setx(ball.xcor() + ball.dx)
+            ball.sety(ball.ycor() + ball.dy)
+            myp.REQUEST("BALLX", ball.xcor())
+            myp.REQUEST("BALLY", ball.ycor())
+        else:
+            ball.setx(int(estado[5]))
+            ball.sety(int(estado[6]))
 
-        ball.setx(ball.xcor() + ball.dx)
-        ball.sety(ball.ycor() + ball.dy)
+        # ball.setx(ball.xcor() + ball.dx)
+        # ball.sety(ball.ycor() + ball.dy)
 
 
     while estado[1] is None or estado[2] == "0000":
@@ -182,68 +176,66 @@ def main():
 
         update_ball()
 
-        # if estado[1] == port:
-        # Bordes
-        # Arriba y abajo
-        if ball.ycor() > 290:
-            ball.sety(290)
-            # Esto hace que la bola rebote
-            ball.dy *= -1
+        if estado[1] == myp.client_server_port:
+            # Bordes
+            # Arriba y abajo
+            if ball.ycor() > 290:
+                ball.sety(290)
+                # Esto hace que la bola rebote
+                ball.dy *= -1
 
-            # os.system("afplay bounce.wav&")
+                # os.system("afplay bounce.wav&")
 
-        elif ball.ycor() < -290:
-            ball.sety(-290)
-            # Esto hace que la bola rebote
-            ball.dy *= -1
+            elif ball.ycor() < -290:
+                ball.sety(-290)
+                # Esto hace que la bola rebote
+                ball.dy *= -1
 
-        # Izquierda y derecha
-        if ball.xcor() > 350:
-            score_a += 1
+            # Izquierda y derecha
+            if ball.xcor() > 350:
+                score_a += 1
 
-            if estado[1] == myp.client_server_port:
-                myp.REQUEST("SCORE", str(score_a))
+                myp.REQUEST("SCOREA", str(score_a))
 
-            pen.clear()
-            pen.write(
-                "Cliente A: {}  Cliente B: {}".format(score_a, score_b),
-                align="center",
-                font=("Courier", 24, "normal"),
-            )
-            ball.goto(0, 0)
-            ball.dx *= -1
+                pen.clear()
+                pen.write(
+                    "Cliente A: {}  Cliente B: {}".format(score_a, score_b),
+                    align="center",
+                    font=("Courier", 24, "normal"),
+                )
+                ball.goto(0, 0)
+                ball.dx *= -1
 
-        elif ball.xcor() < -350:
-            score_b += 1
+            elif ball.xcor() < -350:
+                score_b += 1
 
-            if estado[2] == myp.client_server_port:
-                myp.REQUEST("SCORE", str(score_b))
+                myp.REQUEST("SCOREB", str(score_b))
 
-            pen.clear()
-            pen.write(
-                "Cliente A: {}  Cliente B: {}".format(score_a, score_b),
-                align="center",
-                font=("Courier", 24, "normal"),
-            )
-            ball.goto(0, 0)
-            ball.dx *= -1
+                pen.clear()
+                pen.write(
+                    "Cliente A: {}  Cliente B: {}".format(score_a, score_b),
+                    align="center",
+                    font=("Courier", 24, "normal"),
+                )
+                ball.goto(0, 0)
+                ball.dx *= -1
 
-        # Colisiones con las raquetas
-        if (
-            ball.xcor() < -340
-            and ball.ycor() < paddle_a.ycor() + 50
-            and ball.ycor() > paddle_a.ycor() - 50
-        ):
-            ball.dx *= -1
+            # Colisiones con las raquetas
+            if (
+                ball.xcor() < -340
+                and ball.ycor() < paddle_a.ycor() + 50
+                and ball.ycor() > paddle_a.ycor() - 50
+            ):
+                ball.dx *= -1
 
-        elif (
-            ball.xcor() > 340
-            and ball.ycor() < paddle_b.ycor() + 50
-            and ball.ycor() > paddle_b.ycor() - 50
-        ):
-            ball.dx *= -1
+            elif (
+                ball.xcor() > 340
+                and ball.ycor() < paddle_b.ycor() + 50
+                and ball.ycor() > paddle_b.ycor() - 50
+            ):
+                ball.dx *= -1
 
-        time.sleep(0.01)
+            time.sleep(0.01)
 
     # Close the socket and wait for the receive thread to finish
     myp.client_socket.close()

@@ -206,19 +206,20 @@ void receiveTextFromClient(int sockfd, struct sockaddr_in *client_addr, socklen_
                     memcpy(games[gameIndex].game_data.raqueta2, &text[2], strlen(text) - 1);
                 }
             }
-            else if (text[0] == 'S' && text[1] == 'C')
+            else if (text[0] == 'S' && text[1] == 'A')
             {
-                if (client_addr->sin_port == htons(atoi(games[gameIndex].game_data.cliente1)))
-                {
-                    memcpy(games[gameIndex].game_data.puntaje1, &text[2], strlen(text) - 1);
-                }
-                else if (client_addr->sin_port == htons(atoi(games[gameIndex].game_data.cliente2)))
-                {
-                    memcpy(games[gameIndex].game_data.puntaje2, &text[2], strlen(text) - 1);
-                }
-            } else if (text[0] == 'B' && text[1] == 'X'){
+                memcpy(games[gameIndex].game_data.puntaje1, &text[2], strlen(text) - 1);
+            }
+            else if (text[0] == 'S' && text[1] == 'B')
+            {
+                memcpy(games[gameIndex].game_data.puntaje2, &text[2], strlen(text) - 1);
+            }
+            else if (text[0] == 'B' && text[1] == 'X')
+            {
                 memcpy(games[gameIndex].game_data.pelotaX, &text[2], strlen(text) - 1);
-            } else if (text[0] == 'B' && text[1] == 'Y'){
+            }
+            else if (text[0] == 'B' && text[1] == 'Y')
+            {
                 memcpy(games[gameIndex].game_data.pelotaY, &text[2], strlen(text) - 1);
             }
             games[gameIndex].newMessage = 1;
