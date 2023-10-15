@@ -1,5 +1,6 @@
 import turtle
 import time
+
 # Importamos el módulo de protocolo
 from Protocol import myprotocol as myp
 
@@ -42,7 +43,7 @@ paddle_a = turtle.Turtle()
 paddle_a.speed(0)
 paddle_a.shape("square")
 paddle_a.color("red")
-paddle_a.shapesize(stretch_wid=5,stretch_len=1)
+paddle_a.shapesize(stretch_wid=5, stretch_len=1)
 paddle_a.penup()
 paddle_a.goto(-350, 0)
 
@@ -51,7 +52,7 @@ paddle_b = turtle.Turtle()
 paddle_b.speed(0)
 paddle_b.shape("square")
 paddle_b.color("blue")
-paddle_b.shapesize(stretch_wid=5,stretch_len=1)
+paddle_b.shapesize(stretch_wid=5, stretch_len=1)
 paddle_b.penup()
 paddle_b.goto(350, 0)
 
@@ -75,6 +76,7 @@ pen.hideturtle()
 pen.goto(0, 260)
 pen.write("Cliente A: 0  Cliente B: 0", align="center", font=("Courier", 24, "normal"))
 
+
 # Movimiento de las raquetas
 def paddle_up():
     if estado[1] == port:
@@ -93,14 +95,12 @@ def paddle_up():
 
 
 def paddle_down():
-    
     if estado[1] == port:
         y = paddle_a.ycor()
         y -= 20
         # Se envia el mensaje al servidor con la cabecera (PM: Paddle Move) y la PDU (String con la posición de la raqueta)
         myp.REQUEST("PADDLE", str(y))
         paddle_a.sety(y)
-        
 
     elif estado[2] == port:
         y = paddle_b.ycor()
@@ -108,6 +108,7 @@ def paddle_down():
         # Se envia el mensaje al servidor con la cabecera (PM: Paddle Move ) y la PDU (String con la posición de la raqueta)
         myp.REQUEST("PADDLE", str(y))
         paddle_b.sety(y)
+
 
 # Actualizar la posición de las raquetas
 def update_paddle():
@@ -120,6 +121,7 @@ def update_paddle():
     if estado[2] == port and paddle_a.ycor() != int(estado[3]):
         paddle_a.sety(int(estado[3]))
 
+
 def update_score():
     estado = myp.REQUEST("GET", "STATE")
 
@@ -128,6 +130,7 @@ def update_score():
 
     if estado[2] == port and score_b != int(estado[8]):
         score_b = int(estado[8])
+
 
 def update_ball():
     # estado = myp.REQUEST("GET", "STATE")
@@ -141,9 +144,10 @@ def update_ball():
     # else:
     #     ball.setx(int(estado[5]))
     #     ball.sety(int(estado[6]))
-    
+
     ball.setx(ball.xcor() + ball.dx)
     ball.sety(ball.ycor() + ball.dy)
+
 
 while estado[1] is None or estado[2] == "0000":
     estado = myp.REQUEST("GET", "STATE")
@@ -165,13 +169,12 @@ wn.onkeypress(paddle_down, "s")
 
 # Loop principal del juego
 while score_a < 10 and score_b < 10:
-
-    wn.update()    
+    wn.update()
 
     update_paddle()
-    
+
     update_ball()
-    
+
     # if estado[1] == port:
     # Bordes
     # Arriba y abajo
@@ -180,7 +183,7 @@ while score_a < 10 and score_b < 10:
         # Esto hace que la bola rebote
         ball.dy *= -1
 
-        #os.system("afplay bounce.wav&")
+        # os.system("afplay bounce.wav&")
 
     elif ball.ycor() < -290:
         ball.sety(-290)
@@ -188,14 +191,18 @@ while score_a < 10 and score_b < 10:
         ball.dy *= -1
 
     # Izquierda y derecha
-    if ball.xcor() > 350:        
+    if ball.xcor() > 350:
         score_a += 1
 
         if estado[1] == port:
             myp.REQUEST("SCORE", str(score_a))
 
         pen.clear()
-        pen.write("Cliente A: {}  Cliente B: {}".format(score_a, score_b), align="center", font=("Courier", 24, "normal"))
+        pen.write(
+            "Cliente A: {}  Cliente B: {}".format(score_a, score_b),
+            align="center",
+            font=("Courier", 24, "normal"),
+        )
         ball.goto(0, 0)
         ball.dx *= -1
 
@@ -206,15 +213,27 @@ while score_a < 10 and score_b < 10:
             myp.REQUEST("SCORE", str(score_b))
 
         pen.clear()
-        pen.write("Cliente A: {}  Cliente B: {}".format(score_a, score_b), align="center", font=("Courier", 24, "normal"))
+        pen.write(
+            "Cliente A: {}  Cliente B: {}".format(score_a, score_b),
+            align="center",
+            font=("Courier", 24, "normal"),
+        )
         ball.goto(0, 0)
         ball.dx *= -1
 
     # Colisiones con las raquetas
-    if ball.xcor() < -340 and ball.ycor() < paddle_a.ycor() + 50 and ball.ycor() > paddle_a.ycor() - 50:
-        ball.dx *= -1 
+    if (
+        ball.xcor() < -340
+        and ball.ycor() < paddle_a.ycor() + 50
+        and ball.ycor() > paddle_a.ycor() - 50
+    ):
+        ball.dx *= -1
 
-    elif ball.xcor() > 340 and ball.ycor() < paddle_b.ycor() + 50 and ball.ycor() > paddle_b.ycor() - 50:
+    elif (
+        ball.xcor() > 340
+        and ball.ycor() < paddle_b.ycor() + 50
+        and ball.ycor() > paddle_b.ycor() - 50
+    ):
         ball.dx *= -1
 
     time.sleep(0.01)

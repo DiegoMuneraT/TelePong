@@ -4,7 +4,7 @@ import constants
 
 # Variables de estado
 
-estado = [ 0, None, None, 0, 0, 0, 0, 0, 0]
+estado = [0, None, None, 0, 0, 0, 0, 0, 0]
 
 game_port = 0
 
@@ -16,10 +16,14 @@ client_socket.setblocking(0)
 
 client_port = str(client_socket.getsockname()[1])
 
-print(f"Cliente: {client_port} conectado al servidor: {constants.SERVER_IP} en el puerto: {constants.SERVER_PORT}")
+print(
+    f"Cliente: {client_port} conectado al servidor: {constants.SERVER_IP} en el puerto: {constants.SERVER_PORT}"
+)
+
 
 def get_client_port():
     return str(client_socket.getsockname()[1])
+
 
 def receive_state(client_socket):
     global estado, game_port
@@ -31,42 +35,45 @@ def receive_state(client_socket):
                 estado = rawdata[1].split(",")
             elif rawdata[0] == "port":
                 game_port = int(rawdata[1])
-        
+
         except socket.error as e:
             pass
+
 
 def send_message(client_socket, message, server_port):
     client_socket.sendto(message.encode(), (constants.SERVER_IP, server_port))
 
+
 thread = threading.Thread(target=receive_state, args=(client_socket,))
 
-def REQUEST(header, value):
 
-    if header == 'GET' and value == 'PORT':
+def REQUEST(header, value):
+    if header == "GET" and value == "PORT":
         return get_client_port()
 
-    elif header == 'GET' and value == 'STATE':
+    elif header == "GET" and value == "STATE":
         return estado
-    
-    elif header == 'PADDLE':
-        send_message(client_socket, 'PM'+str(value), game_port)
-        return 'PADDLE MOVE OK'
-    
-    elif header == 'BALLX':
-        send_message(client_socket, 'BX'+str(value), game_port)
-        return 'BALL MOVE OK'
-    
-    elif header == 'BALLY':
-        send_message(client_socket, 'BY'+str(value), game_port)
-        return 'BALL MOVE OK'
-    
-    elif header == 'PLAYER JOIN':
-        send_message(client_socket, 'PLJ', constants.SERVER_PORT)
-        return 'PLAYER JOINED'
-    
-    elif header == 'SCORE':
-        send_message(client_socket, 'SC'+str(value), game_port)
-        
+
+    elif header == "PADDLE":
+        send_message(client_socket, "PM" + str(value), game_port)
+        return "PADDLE MOVE OK"
+
+    elif header == "BALLX":
+        send_message(client_socket, "BX" + str(value), game_port)
+        return "BALL MOVE OK"
+
+    elif header == "BALLY":
+        send_message(client_socket, "BY" + str(value), game_port)
+        return "BALL MOVE OK"
+
+    elif header == "PLAYER JOIN":
+        send_message(client_socket, "PLJ", constants.SERVER_PORT)
+        return "PLAYER JOINED"
+
+    elif header == "SCORE":
+        send_message(client_socket, "SC" + str(value), game_port)
+
+
 """
 
 REQUEST es un método que se encarga de enviar una solicitud al servidor.

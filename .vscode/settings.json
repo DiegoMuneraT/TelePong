@@ -1,10 +1,14 @@
 {
-    "files.associations": {
-        "stdlib.h": "c",
-        "netdb.h": "c",
-        "types.h": "c",
-        "inet.h": "c",
-        "myprotocol.h": "c"
-    },
-    "C_Cpp.default.compilerPath": "/usr/bin/gcc"
+  "files.associations": {
+    "stdlib.h": "c",
+    "netdb.h": "c",
+    "types.h": "c",
+    "inet.h": "c",
+    "myprotocol.h": "c"
+  },
+  "C_Cpp.default.compilerPath": "/usr/bin/gcc",
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
+  "python.formatting.provider": "none"
 }
