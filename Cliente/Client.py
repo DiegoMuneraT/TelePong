@@ -120,20 +120,6 @@ def main():
         if estado[2] == myp.client_server_port and paddle_a.ycor() != int(estado[3]):
             paddle_a.sety(int(estado[3]))
 
-    def update_score():
-        global score_a, score_b
-        estado = myp.REQUEST("GET", "STATE")
-
-        if estado[2] == myp.client_server_port:
-            score_a = int(estado[7])
-            score_b = int(estado[8])
-        pen.clear()
-        pen.write(
-            "Cliente A: {}  Cliente B: {}".format(score_a, score_b),
-            align="center",
-            font=("Courier", 24, "normal"),
-        )
-
     def update_ball():
         estado = myp.REQUEST("GET", "STATE")
 
@@ -171,14 +157,9 @@ def main():
     while score_a < 10 and score_b < 10:
         wn.update()
 
-        if wn.onkeypress(paddle_up, "w"):
-            print("w")
-
         update_paddle()
 
         update_ball()
-
-        update_score()
 
         if estado[1] == myp.client_server_port:
             # Bordes
@@ -227,7 +208,19 @@ def main():
             ):
                 ball.dx *= -1
 
-            time.sleep(0.01)
+        if estado[2] == myp.client_server_port:
+            estado = myp.REQUEST("GET", "STATE")
+            score_a = int(estado[7])
+            score_b = int(estado[8])
+
+        pen.clear()
+        pen.write(
+            "Cliente A: {}  Cliente B: {}".format(score_a, score_b),
+            align="center",
+            font=("Courier", 24, "normal"),
+        )
+
+        time.sleep(0.01)
 
     # Close the socket and wait for the receive thread to finish
     myp.client_socket.close()
