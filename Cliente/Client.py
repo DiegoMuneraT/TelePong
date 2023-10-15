@@ -153,8 +153,12 @@ def main():
     wn.onkeypress(paddle_up, "w")
     wn.onkeypress(paddle_down, "s")
 
+    if estado[2] == myp.client_server_port:
+        myp.REQUEST("PADDLE", str(0))
+
     # Loop principal del juego
     while score_a < 10 and score_b < 10:
+        print(estado)
         wn.update()
 
         update_paddle()
