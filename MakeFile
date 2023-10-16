@@ -1,0 +1,25 @@
+# Nombre del servidor y el compilador
+SERVER = server
+CC = gcc
+
+# Opciones de compilacion
+CFLAGS = -pthread
+
+# Fuentes y objetos
+SRC = /TelePong/Servidor/server.c
+OBJ = $(SRC:.c=.o)
+
+# Objetivos
+all: $(SERVER)
+
+$(SERVER): $(OBJ)
+	$(CC) $(CFLAGS) -o $(SERVER) $(OBJ)
+
+%.o : %.c
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+run: $(SERVER)
+	./$(SERVER) 8080 logFile
+
+clean:
+	rm -f $(SERVER) $(OBJ)
