@@ -30,17 +30,17 @@ void* handleGame(void* gameIndex) {
 // Función principal
 int main(int argc, char *argv[]) {
 
-    // if(argc != 3){
-    //     fprintf(stderr, "Uso: %s <PORT> <LogFile>\n", argv[0]);
-    //     exit(EXIT_FAILURE);
-    // }
+    if(argc != 3){
+        fprintf(stderr, "Uso: %s <PORT> <LogFile>\n", argv[0]);
+        exit(EXIT_FAILURE);
+    }
 
-    // // Guardar el puerto y el archivo de log
-    // PORT = atoi(argv[1]);
+    // Guardar el puerto y el archivo de log
+    PORT = atoi(argv[1]);
     // char logFile[256];
     // sprintf(logFile, "Logs/%s", argv[2]);
 
-    // // Redirigir las salidas al archivo de log
+    // Redirigir las salidas al archivo de log
     // freopen(logFile, "w", stdout);
     // freopen(logFile, "w", stderr);
 
@@ -85,5 +85,3 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
-
-

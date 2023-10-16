@@ -5,9 +5,9 @@
 #include <arpa/inet.h>
 
 #define BUFFER_SIZE 1024
-#define NUM_THREADS 2
+#define NUM_THREADS 4
 
-int PORT = 8080;
+int PORT = 0;
 char *logFile = NULL;
 
 typedef struct{
