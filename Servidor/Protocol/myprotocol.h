@@ -136,6 +136,14 @@ void sendPortToClient(int sockfd, struct sockaddr_in *client_addr, socklen_t add
     sendto(sockfd, message, strlen(message), 0, (struct sockaddr *)client_addr, addr_len);
 }
 
+// Enviar el puerto a un cliente
+void sendLeftToClient(int sockfd, struct sockaddr_in *client_addr, socklen_t addr_len, int player)
+{
+    char message[46];
+    sprintf(message, "left:%d",player);
+    sendto(sockfd, message, strlen(message), 0, (struct sockaddr *)client_addr, addr_len);
+}
+
 
 // Marcar un mensaje recibido por un cliente
 void markReceivedMessage(ClientInfo *client, struct sockaddr_in *client_addr, int sockfd, socklen_t addr_len, Game *game)
@@ -197,11 +205,11 @@ void receiveTextFromClient(int sockfd, struct sockaddr_in *client_addr, socklen_
 
             if (text[0] == 'P' && text[1] == 'M')
             {
-                if (client_addr->sin_port == htons(atoi(games[gameIndex].game_data.cliente1)))
+                if (compareClientAddr(client_addr,&games[gameIndex].clients[0].addr))
                 {
                     memcpy(games[gameIndex].game_data.raqueta1, &text[2], strlen(text) - 1);
                 }
-                else if (client_addr->sin_port == htons(atoi(games[gameIndex].game_data.cliente2)))
+                else if (compareClientAddr(client_addr,&games[gameIndex].clients[1].addr))
                 {
                     memcpy(games[gameIndex].game_data.raqueta2, &text[2], strlen(text) - 1);
                 }
@@ -221,6 +229,30 @@ void receiveTextFromClient(int sockfd, struct sockaddr_in *client_addr, socklen_
             else if (text[0] == 'B' && text[1] == 'Y')
             {
                 memcpy(games[gameIndex].game_data.pelotaY, &text[2], strlen(text) - 1);
+            } else if (text[0] == 'P' && text[1] == 'L' && text[2] == 'V'){
+                if (compareClientAddr(client_addr,&games[gameIndex].clients[0].addr))
+                {
+                    if (games[gameIndex].is_active == 1){
+                        if (strcmp(games[gameIndex].game_data.cliente2, "0000") != 0){
+                            sendLeftToClient(sockfd,&games[gameIndex].clients[1].addr,addr_len,0);
+                            strcpy(games[gameIndex].game_data.cliente1, "0000");
+                        }else{
+                            initializeGameInstance(&games[gameIndex], gameIndex);
+                        }
+                    }
+                }
+                else if (compareClientAddr(client_addr,&games[gameIndex].clients[1].addr))
+                {
+                    if (games[gameIndex].is_active == 1){
+                        if (strcmp(games[gameIndex].game_data.cliente1, "0000") != 0){
+                            sendLeftToClient(sockfd,&games[gameIndex].clients[0].addr,addr_len,0);
+                            strcpy(games[gameIndex].game_data.cliente2, "0000");
+                        }else{
+                            initializeGameInstance(&games[gameIndex], gameIndex);
+                        }
+                    }
+                }
+                printf("Game %d Changed: %s\n",gameIndex,games[gameIndex].game_data.estado);
             }
             games[gameIndex].newMessage = 1;
         }

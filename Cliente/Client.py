@@ -19,14 +19,58 @@ Variables de estado
 
 """
 
+# Dibujamos la pantalla
+wn = turtle.Screen()
+wn.title("Pong")
+wn.bgcolor("black")
+wn.setup(width=800, height=600)
+wn.tracer(0)
 
-def main():
-    estado = myp.REQUEST("GET", "STATE")
+# Puntaje
+score_a = 0
+score_b = 0
 
-    myp.thread.start()
 
-    myp.REQUEST("PLAYER JOIN", "NULL")
+# Raqueta A
+paddle_a = turtle.Turtle()
+paddle_a.speed(0)
+paddle_a.shape("square")
+paddle_a.color("red")
+paddle_a.shapesize(stretch_wid=5, stretch_len=1)
+paddle_a.penup()
+paddle_a.goto(-350, 0)
 
+# Raqueta B
+paddle_b = turtle.Turtle()
+paddle_b.speed(0)
+paddle_b.shape("square")
+paddle_b.color("blue")
+paddle_b.shapesize(stretch_wid=5, stretch_len=1)
+paddle_b.penup()
+paddle_b.goto(350, 0)
+
+# Bola
+ball = turtle.Turtle()
+ball.speed(0)
+ball.shape("circle")
+ball.color("white")
+ball.penup()
+ball.goto(0, 0)
+ball.dx = 2
+ball.dy = 2
+
+# Puntaje
+pen = turtle.Turtle()
+pen.speed(0)
+pen.shape("square")
+pen.color("white")
+pen.penup()
+pen.hideturtle()
+pen.goto(0, 260)
+
+
+def restart_variables():
+    global wn, score_a, score_b, paddle_a, paddle_b, ball, pen
     # Dibujamos la pantalla
     wn = turtle.Screen()
     wn.title("Pong")
@@ -74,9 +118,73 @@ def main():
     pen.penup()
     pen.hideturtle()
     pen.goto(0, 260)
-    pen.write(
-        "Cliente A: 0  Cliente B: 0", align="center", font=("Courier", 24, "normal")
-    )
+
+
+# Mostrar Ganador
+def display_winner(winner):
+    play_again = False
+    # Continuar Juego
+    continue_game = True
+
+    # Clear the screen
+    wn.clear()
+    wn.bgcolor("black")
+
+    # Display the winner
+    pen.goto(0, 200)  # Adjusted position for the winner text
+    pen.write(f"{winner}", align="center", font=("Courier", 36, "normal"))
+
+    # Display Play Again button
+    play_again_button = turtle.Turtle()
+    play_again_button.speed(0)
+    play_again_button.color("blue")
+    play_again_button.goto(0, 50)  # Adjusted position for the Play Again button
+    play_again_button.shapesize(4, 5)  # Larger button
+    pen.goto(0, 70)
+    pen.write("Play Again", align="center", font=("Courier", 24, "normal"))
+
+    # Display Leave button
+    leave_button = turtle.Turtle()
+    leave_button.speed(0)
+    leave_button.color("red")
+    leave_button.goto(0, -50)  # Adjusted position for the Leave button
+    leave_button.shapesize(4, 5)  # Larger button
+    pen.goto(0, -30)
+    pen.write("Leave", align="center", font=("Courier", 24, "normal"))
+
+    # Define the function to restart the game
+    def restart_game(x, y):
+        nonlocal play_again
+        print("Jugar otra vez")  # Modify this function as needed
+        # You can add logic here to restart the game
+        nonlocal continue_game
+        continue_game = False  # Set the flag to end the game
+        # Close the socket and wait for the receive thread to finish
+        # myp.client_socket.close()
+        play_again = True
+
+    # Define the function to leave the game
+    def leave_game(x, y):
+        nonlocal continue_game
+        continue_game = False  # Set the flag to end the game
+        wn.bye()  # This will close the turtle window
+        # Close the socket and wait for the receive thread to finish
+
+    # Set up button click events
+    play_again_button.onclick(restart_game)
+    leave_button.onclick(leave_game)
+
+    while continue_game:
+        wn.update()
+
+    return play_again
+
+
+def main():
+    global continue_game, score_a, score_b, wn, paddle_a, paddle_b, ball
+    estado = myp.REQUEST("GET", "STATE")
+
+    print(myp.REQUEST("PLAYER JOIN", "NULL"))
 
     # Movimiento de las raquetas
     def paddle_up():
@@ -141,9 +249,15 @@ def main():
         continue
 
     if estado[1] == myp.client_server_port:
+        pen.write(
+            "YOU: 0  THE ENEMY: 0", align="center", font=("Courier", 24, "normal")
+        )
         paddle_a.color("blue")
         paddle_b.color("red")
     else:
+        pen.write(
+            "THE ENEMY: 0  YOU: 0", align="center", font=("Courier", 24, "normal")
+        )
         paddle_a.color("red")
         paddle_b.color("blue")
 
@@ -156,9 +270,10 @@ def main():
     if estado[2] == myp.client_server_port:
         myp.REQUEST("PADDLE", str(0))
 
+    continue_game = True
+
     # Loop principal del juego
-    while score_a < 10 and score_b < 10:
-        print(estado)
+    while score_a < 5 and score_b < 5 and myp.you_win == False:
         wn.update()
 
         update_paddle()
@@ -172,8 +287,6 @@ def main():
                 ball.sety(290)
                 # Esto hace que la bola rebote
                 ball.dy *= -1
-
-                # os.system("afplay bounce.wav&")
 
             elif ball.ycor() < -290:
                 ball.sety(-290)
@@ -211,25 +324,43 @@ def main():
                 and ball.ycor() > paddle_b.ycor() - 50
             ):
                 ball.dx *= -1
+            pen.clear()
+            pen.write(
+                "YOU: {}  THE ENEMY: {}".format(score_a, score_b),
+                align="center",
+                font=("Courier", 24, "normal"),
+            )
 
         if estado[2] == myp.client_server_port:
             estado = myp.REQUEST("GET", "STATE")
             score_a = int(estado[7])
             score_b = int(estado[8])
-
-        pen.clear()
-        pen.write(
-            "Cliente A: {}  Cliente B: {}".format(score_a, score_b),
-            align="center",
-            font=("Courier", 24, "normal"),
-        )
+            pen.clear()
+            pen.write(
+                "THE ENEMY: {}  YOU: {}".format(score_a, score_b),
+                align="center",
+                font=("Courier", 24, "normal"),
+            )
 
         time.sleep(0.01)
 
-    # Close the socket and wait for the receive thread to finish
-    myp.client_socket.close()
-    myp.thread.join()
+    if estado[1] == myp.client_server_port:
+        winner = "You Won!" if score_a == 5 else "You Lost :("
+    else:
+        winner = "You Won!" if score_b == 5 else "You Lost :("
+
+    myp.REQUEST("PLAYER LEAVE", 0)
+    play_again = display_winner(winner)
+    myp.estado = [0, None, None, 0, 0, 0, 0, 0, 0]
+    return play_again
 
 
 if __name__ == "__main__":
-    main()
+    myp.thread.start()
+    play = main()
+    while play:
+        wn.clear()
+        restart_variables()
+        play = main()
+    myp.thread.join()
+    myp.client_socket.close()
