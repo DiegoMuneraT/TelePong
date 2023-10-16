@@ -6,14 +6,14 @@ CC = gcc
 CFLAGS = -pthread
 
 # Fuentes y objetos
-SRC = /Servidor/server.c
+SRC = Servidor/server.c
 OBJ = $(SRC:.c=.o)
 
 # Objetivos
 all: $(SERVER)
 
 $(SERVER): $(OBJ)
-	$(CC) $(CFLAGS) -o $(SERVER) $(OBJ)
+	$(CC) $(CFLAGS) -o $@ $^
 
 %.o : %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
@@ -23,3 +23,5 @@ run: $(SERVER)
 
 clean:
 	rm -f $(SERVER) $(OBJ)
+
+.PHONY: all clean run
