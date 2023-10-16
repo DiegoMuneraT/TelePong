@@ -45,6 +45,8 @@ Si desea puede utilizar el script `Makefile` siguiendo estos pasos:
 3. Ejecute el script con el siguiente comando: `make`
 4. Ahora ya tiene compilado el servidor, para ejecutarlo simplemente ejecute el comando `make run` cada vez que quiera correr el servidor
 
+**Nota:** Tenga en cuenta que siempre que utilice la compilación y ejecución por el archivo Make, el servidor abrira el puerto 8080
+
 **Nota:** La bandera `-pthread` se utiliza para vincular la biblioteca de hilos
 
 ### Uso del servidor
