@@ -6,7 +6,7 @@ CC = gcc
 CFLAGS = -pthread
 
 # Fuentes y objetos
-SRC = /TelePong/Servidor/server.c
+SRC = /Servidor/server.c
 OBJ = $(SRC:.c=.o)
 
 # Objetivos

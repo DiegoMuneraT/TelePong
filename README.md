@@ -29,6 +29,7 @@ Este proyecto es un servidor de juego en C que utiliza hilos para manejar múlti
 
 - gcc: Se requiere un compilador C para compilar el servidor
 - pthread: La biblioteca se utiliza para la gestion de hilos en C
+- make: La biblioteca se utiliza para crear el archivo MakeFile para facilitar la ejecución del servidor
 
 ### Compilación del servidor
 
