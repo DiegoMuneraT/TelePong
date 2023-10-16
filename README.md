@@ -39,6 +39,12 @@ Para compilar el servidor, siga estos pasos:
 2. Dirigase al directorio donde tiene descargado TelePong y ejecute el comando `cd Telepong/Servidor/`
 3. Compile el código con el siguiente comando: `gcc server.c -o server -pthread`
 
+Si desea puede utilizar el script `Makefile` siguiendo estos pasos:
+1. Abra una terminal en su sistema
+2. Dirigase al directorio donde tiene descargado TelePong y ejecute el comando `cd Telepong`
+3. Ejecute el script con el siguiente comando: `make`
+4. Ahora ya tiene compilado el servidor, para ejecutarlo simplemente ejecute el comando `make run` cada vez que quiera correr el servidor
+
 **Nota:** La bandera `-pthread` se utiliza para vincular la biblioteca de hilos
 
 ### Uso del servidor
