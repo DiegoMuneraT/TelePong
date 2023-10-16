@@ -64,7 +64,7 @@ El cliente le permite controlar una raqueta y jugar al juego contra otro jugador
 
 El sistema del juego consta de dos componentes principales: el servidor implementado en C y el cliente desarrollado en Python. La arquitectura se basa en el modelo cliente-servidor, donde el servidor gestiona las instancias de juego y se comunica con los clientes para mantener la sincronización del juego.
 
---imagen--
+<img width="1619" alt="Captura de pantalla 2023-10-15 a la(s) 6 55 40 p  m" src="https://github.com/DiegoMuneraT/TelePong/assets/73514009/b9406b5d-3e9f-47b2-9389-54da6372d483">
 
 #### Servidor
 
