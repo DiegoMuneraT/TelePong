@@ -1,5 +1,5 @@
 # Nombre del servidor y el compilador
-SERVER = server
+SERVER = Servidor/server
 CC = gcc
 
 # Opciones de compilacion

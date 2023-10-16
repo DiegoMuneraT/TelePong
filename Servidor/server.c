@@ -37,12 +37,12 @@ int main(int argc, char *argv[]) {
 
     // Guardar el puerto y el archivo de log
     PORT = atoi(argv[1]);
-    char logFile[256];
-    sprintf(logFile, "Logs/%s", argv[2]);
+    // char logFile[256];
+    // sprintf(logFile, "Logs/%s", argv[2]);
 
     // Redirigir las salidas al archivo de log
-    freopen(logFile, "w", stdout);
-    freopen(logFile, "w", stderr);
+    // freopen(logFile, "w", stdout);
+    // freopen(logFile, "w", stderr);
 
     // Inicializar la comunicación
     startCommunication(PORT, &sockfd[0], &server_addr[0]);
@@ -85,5 +85,3 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
-
-
